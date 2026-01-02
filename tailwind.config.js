@@ -15,6 +15,9 @@ export default {
       spacing: {
         '18': '4.5rem',
         '22': '5.5rem',
+      },
+      colors: {
+        primary: { 50: '#eff6ff', 500: '#3b82f6', 900: '#1e3a8a' }
       }
     },
   },

@@ -48,6 +48,7 @@ export interface ProgramSummary {
   imageUrl?: string;
   durationHours?: number;
   maxParticipants?: number;
+  categoryName?: string;
 }
 
 export interface Testimonial {
