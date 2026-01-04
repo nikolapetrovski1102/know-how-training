@@ -29,10 +29,12 @@ export interface Hero {
 }
 
 export interface ContentSection {
-  type: 'stats' | 'programs' | 'testimonials' | 'cta';
+  type: string;
   title?: string;
   subtitle?: string;
-  items?: Stat[] | ProgramSummary[] | Testimonial[];
+  description?: string;
+  items?: any[];
+  [key: string]: any;
 }
 
 export interface Stat {
@@ -56,4 +58,44 @@ export interface Testimonial {
   authorName: string;
   authorPosition?: string;
   companyLogoUrl?: string;
+}
+
+export interface PageData {
+  id: number;
+  slug: string;
+  isPublished: boolean;
+  languageCode: string;
+  
+  // SEO
+  seoTitle: string;
+  seoDescription?: string;
+  
+  // Hero
+  heroTitle?: string;
+  heroSubtitle?: string;
+  heroCtaText?: string;
+  heroCtaUrl?: string;
+  heroImage?: string;
+  
+  // Content
+  contentSectionsJson?: string;
+  
+  // OpenGraph
+  openGraphTitle?: string;
+  openGraphDescription?: string;
+  openGraphImage?: string;
+  
+  // Programs
+  programs?: Program[];
+}
+
+export interface Program {
+  id: number;
+  slug: string;
+  title: string;
+  shortDescription?: string;
+  imageUrl?: string;
+  durationHours?: number;
+  maxParticipants?: number;
+  categoryName?: string;
 }
