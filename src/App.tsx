@@ -10,7 +10,7 @@ import { Menu, X, ChevronLeft, LayoutDashboard, Image, Users } from 'lucide-reac
 
 // ADMIN PAGES
 import { AdminPagesList } from './Admin/pages/AdminPagesList';
-import { EditHome } from './Admin/pages/EditHome';
+import { EditHome } from './Admin/Pages/EditHome';
 import { useState } from 'react';
 
 const queryClient = new QueryClient({

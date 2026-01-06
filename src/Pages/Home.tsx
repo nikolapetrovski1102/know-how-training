@@ -199,56 +199,38 @@ export const Home: React.FC = () => {
       `}</style>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-white via-slate-50 to-white">
+      <section className="relative min-h-screen flex items-center overflow-hidden"
+        style={{
+          backgroundImage: hero.image ? `url('${API_BASE}${hero.image}')` : 'none',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        
+        {/* Overlay for better text readability */}
         
         {/* Animated Background Circles */}
-        <div className="absolute top-20 right-10 w-96 h-96 bg-slate-100 rounded-full opacity-30 blur-3xl animate-float"></div>
-        <div className="absolute bottom-20 left-10 w-[600px] h-[600px] bg-slate-50 rounded-full opacity-40 blur-3xl animate-float-reverse"></div>
-        
-        {/* Red accent circle */}
-        <div className="absolute top-40 right-32 w-32 h-32 bg-red-600 rounded-full blur-2xl animate-pulse-slow"></div>
-        
-        {/* Additional floating elements */}
-        <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-slate-100 rounded-full opacity-20 blur-3xl animate-float" style={{ animationDelay: '5s' }}></div>
-        <div className="absolute bottom-1/4 right-1/3 w-80 h-80 bg-slate-50 rounded-full opacity-25 blur-3xl animate-float-reverse" style={{ animationDelay: '3s' }}></div>
-        
-        {/* Hero Image */}
-        {hero.image && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none animate-fade-in">
-            <img
-              src={hero.image.startsWith('/') ? `${API_BASE}${hero.image}` : hero.image}
-              alt=""
-              className="w-auto h-[90vh] object-contain opacity-80"
-              style={{
-                mixBlendMode: 'multiply'
-              }}
-            />
-            <div 
-              className="absolute inset-0"
-              style={{
-                background: 'linear-gradient(to right, rgba(255,255,255,1) 0%, rgba(255,255,255,0.8) 10%, transparent 20%, transparent 80%, rgba(255,255,255,0.8) 90%, rgba(255,255,255,1) 100%)'
-              }}
-            />
-          </div>
-        )}
+        <div className="absolute top-20 right-10 w-96 h-96 bg-slate-400 rounded-full opacity-20 blur-3xl animate-float"></div>
+        <div className="absolute bottom-20 left-10 w-[600px] h-[600px] bg-slate-300 rounded-full opacity-30 blur-3xl animate-float-reverse"></div>
+        <div className="absolute top-40 right-32 w-32 h-32 bg-red-600 rounded-full opacity-20 blur-2xl animate-pulse-slow"></div>
 
         <div className="container mx-auto px-8 py-20 relative z-10">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             
-            {/* Left Content - REMOVED color/size classes to allow inline styles */}
+            {/* Left Content */}
             <div className="space-y-8">
               <div className="w-16 h-1 bg-red-600 mb-4 animate-fade-in"></div>
               
               {hero.title && (
                 <h1 
-                  className="leading-tight tracking-tight animate-fade-in-up animation-delay-200"
+                  className="text-5xl md:text-6xl font-bold text-slate-900 leading-tight tracking-tight animate-fade-in-up animation-delay-200"
                   dangerouslySetInnerHTML={{ __html: hero.title }}
                 />
               )}
 
               {hero.subtitle && (
                 <p 
-                  className="leading-relaxed max-w-xl animate-fade-in-up animation-delay-400"
+                  className="text-lg text-slate-700 leading-relaxed max-w-xl animate-fade-in-up animation-delay-400"
                   dangerouslySetInnerHTML={{ __html: hero.subtitle }}
                 />
               )}
@@ -257,7 +239,7 @@ export const Home: React.FC = () => {
                 <div className="animate-fade-in-up animation-delay-600">
                   <Link
                     to={hero.ctaUrl || '#'}
-                    className="inline-block bg-red-600 text-white px-8 py-3 rounded font-medium text-sm tracking-wide hover:bg-red-700 transition-all shadow-sm hover:shadow-lg hover:scale-105"
+                    className="inline-block bg-red-600 text-white px-8 py-4 rounded-lg font-semibold text-base tracking-wide hover:bg-red-700 transition-all shadow-lg hover:shadow-xl hover:scale-105"
                   >
                     <span dangerouslySetInnerHTML={{ __html: hero.ctaText }} />
                   </Link>
@@ -265,44 +247,48 @@ export const Home: React.FC = () => {
               )}
             </div>
 
-            {/* Right Side - Intro Card - REMOVED color/size classes */}
-            {introCard && (
-              <div className="relative animate-fade-in-up animation-delay-400">
-                <div className="bg-white border-l-4 border-red-600 shadow-sm rounded p-8 max-w-sm mx-auto lg:ml-auto hover:shadow-lg transition-shadow">
-                  {introCard.greeting && (
-                    <div
-                      className="mb-4"
-                      dangerouslySetInnerHTML={{ __html: introCard.greeting }}
-                    />
-                  )}
-                  
-                  {introCard.description && (
-                    <div
-                      className="leading-relaxed"
-                      dangerouslySetInnerHTML={{ __html: introCard.description }}
-                    />
-                  )}
-                  
-                  {introCard.name && (
-                    <>
-                      <div
-                        className="mt-4"
-                        dangerouslySetInnerHTML={{ __html: introCard.name }}
-                      />
-                      {introCard.title && (
-                        <div
-                          className="mt-1"
-                          dangerouslySetInnerHTML={{ __html: introCard.title }}
-                        />
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
-            )}
+            {/* Empty div to maintain grid structure on mobile */}
+            <div className="lg:hidden"></div>
           </div>
         </div>
+
+        {/* Intro Card - Positioned absolutely relative to section, outside grid */}
+        {introCard && (
+          <div className="hidden lg:block absolute bottom-8 right-8 z-20 animate-fade-in-up animation-delay-400 max-w-sm">
+            <div className="bg-white/95 backdrop-blur-sm border-l-4 border-red-600 shadow-xl rounded-lg p-6 hover:shadow-2xl transition-all duration-300">
+              {introCard.greeting && (
+                <div
+                  className="mb-4 text-slate-900 font-semibold text-lg"
+                  dangerouslySetInnerHTML={{ __html: introCard.greeting }}
+                />
+              )}
+              
+              {introCard.description && (
+                <div
+                  className="leading-relaxed text-sm text-slate-700 mb-4"
+                  dangerouslySetInnerHTML={{ __html: introCard.description }}
+                />
+              )}
+              
+              {introCard.name && (
+                <>
+                  <div
+                    className="mt-4 font-bold text-slate-900 text-base"
+                    dangerouslySetInnerHTML={{ __html: introCard.name }}
+                  />
+                  {introCard.title && (
+                    <div
+                      className="mt-1 text-xs font-medium text-slate-600 uppercase tracking-wide"
+                      dangerouslySetInnerHTML={{ __html: introCard.title }}
+                    />
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </section>
+
 
       {/* Stats Section - REMOVED color/size classes */}
       {stats && stats.items && stats.items.length > 0 && (
