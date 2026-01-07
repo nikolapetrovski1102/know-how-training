@@ -54,7 +54,7 @@ export const EditHome: React.FC = () => {
   const [edits, setEdits] = useState<EditableContent[]>([]);
   const [imageEdits, setImageEdits] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
-  
+
   const [languages, setLanguages] = useState<Language[]>([]);
   const [selectedLanguage, setSelectedLanguage] = useState<string>('en');
   const [loadingLanguages, setLoadingLanguages] = useState(true);
@@ -69,10 +69,35 @@ export const EditHome: React.FC = () => {
   const [introTitle, setIntroTitle] = useState('');
   const [statsTitle, setStatsTitle] = useState('');
   const [statsItems, setStatsItems] = useState<Array<{ value: string; label: string }>>([]);
-  
+
   // Featured Programs state
   const [featuredTitle, setFeaturedTitle] = useState('');
   const [featuredSubtitle, setFeaturedSubtitle] = useState('');
+
+  // Videos Section state
+  const [videosTitle, setVideosTitle] = useState('');
+  const [videosSubtitle, setVideosSubtitle] = useState('');
+  const [videosItems, setVideosItems] = useState<Array<{ title: string; description: string; url: string; thumbnail?: string }>>([]);
+
+  // Coaches/Instructors Section state
+  const [coachesTitle, setCoachesTitle] = useState('');
+  const [coachesSubtitle, setCoachesSubtitle] = useState('');
+  const [coachesItems, setCoachesItems] = useState<Array<{ name: string; title: string; bio: string; image?: string; expertise?: string }>>([]);
+
+  // Resources/PDFs Section state
+  const [resourcesTitle, setResourcesTitle] = useState('');
+  const [resourcesSubtitle, setResourcesSubtitle] = useState('');
+  const [resourcesItems, setResourcesItems] = useState<Array<{ title: string; description: string; fileUrl: string; fileType?: string }>>([]);
+
+  // Testimonials Section state
+  const [testimonialsTitle, setTestimonialsTitle] = useState('');
+  const [testimonialsSubtitle, setTestimonialsSubtitle] = useState('');
+  const [testimonialsItems, setTestimonialsItems] = useState<Array<{ quote: string; author: string; role: string; company?: string; image?: string }>>([]);
+
+  // FAQ Section state
+  const [faqTitle, setFaqTitle] = useState('');
+  const [faqSubtitle, setFaqSubtitle] = useState('');
+  const [faqItems, setFaqItems] = useState<Array<{ question: string; answer: string }>>([]);
 
   useEffect(() => {
     fetch(`${API_BASE}/api/languages`)
@@ -114,18 +139,18 @@ export const EditHome: React.FC = () => {
       })
       .then(apiResponse => {
         console.log('API Response:', apiResponse);
-        
+
         setData(apiResponse);
-        
+
         // Set local state
         setHeroTitle(apiResponse.heroTitle || '');
         setHeroSubtitle(apiResponse.heroSubtitle || '');
         setHeroCtaText(apiResponse.heroCtaText || '');
-        
+
         // Parse sections
         const sectionsJson = apiResponse.contentSections || apiResponse.contentSectionsJson;
         const sections = sectionsJson ? JSON.parse(sectionsJson) : [];
-        
+
         // Intro section
         const intro = sections.find((s: any) => (s.Type || s.type || '').toLowerCase() === 'intro-card');
         if (intro) {
@@ -134,21 +159,61 @@ export const EditHome: React.FC = () => {
           setIntroName(intro.Name || intro.name || '');
           setIntroTitle(intro.Title || intro.title || '');
         }
-        
+
         // Stats section
         const stats = sections.find((s: any) => (s.Type || s.type || '').toLowerCase() === 'stats');
         if (stats) {
           setStatsTitle(stats.Title || stats.title || '');
           setStatsItems(stats.Items || stats.items || []);
         }
-        
+
         // Featured Programs section
         const featured = sections.find((s: any) => (s.Type || s.type || '').toLowerCase() === 'featured-programs');
         if (featured) {
           setFeaturedTitle(featured.Title || featured.title || '');
           setFeaturedSubtitle(featured.Subtitle || featured.subtitle || '');
         }
-        
+
+        // Videos section
+        const videos = sections.find((s: any) => (s.Type || s.type || '').toLowerCase() === 'videos');
+        if (videos) {
+          setVideosTitle(videos.Title || videos.title || '');
+          setVideosSubtitle(videos.Subtitle || videos.subtitle || '');
+          setVideosItems(videos.Items || videos.items || []);
+        }
+
+        // Coaches section
+        const coaches = sections.find((s: any) => (s.Type || s.type || '').toLowerCase() === 'coaches' || (s.Type || s.type || '').toLowerCase() === 'instructors');
+        if (coaches) {
+          setCoachesTitle(coaches.Title || coaches.title || '');
+          setCoachesSubtitle(coaches.Subtitle || coaches.subtitle || '');
+          setCoachesItems(coaches.Items || coaches.items || []);
+        }
+
+        // Resources section
+        const resources = sections.find((s: any) => (s.Type || s.type || '').toLowerCase() === 'resources' || (s.Type || s.type || '').toLowerCase() === 'pdfs');
+        if (resources) {
+          setResourcesTitle(resources.Title || resources.title || '');
+          setResourcesSubtitle(resources.Subtitle || resources.subtitle || '');
+          setResourcesItems(resources.Items || resources.items || []);
+        }
+
+        // Testimonials section
+        const testimonials = sections.find((s: any) => (s.Type || s.type || '').toLowerCase() === 'testimonials');
+        if (testimonials) {
+          setTestimonialsTitle(testimonials.Title || testimonials.title || '');
+          setTestimonialsSubtitle(testimonials.Subtitle || testimonials.subtitle || '');
+          setTestimonialsItems(testimonials.Items || testimonials.items || []);
+        }
+
+        // FAQ section
+        const faq = sections.find((s: any) => (s.Type || s.type || '').toLowerCase() === 'faq');
+        if (faq) {
+          setFaqTitle(faq.Title || faq.title || '');
+          setFaqSubtitle(faq.Subtitle || faq.subtitle || '');
+          setFaqItems(faq.Items || faq.items || []);
+        }
+
         setLoading(false);
         setEdits([]);
         setImageEdits({});
@@ -165,12 +230,12 @@ export const EditHome: React.FC = () => {
       setEdits(prev => prev.filter(e => e.path !== path));
       return;
     }
-    
+
     setEdits(prev => {
       const existingIndex = prev.findIndex(e => e.path === path);
       if (existingIndex > -1) {
         const updated = [...prev];
-        updated[existingIndex].edited = edited; 
+        updated[existingIndex].edited = edited;
         return updated;
       }
       return [...prev, { path, original, edited }];
@@ -179,7 +244,7 @@ export const EditHome: React.FC = () => {
 
   const trackImageChange = useCallback((path: string, newUrl: string) => {
     setImageEdits(prev => ({ ...prev, [path]: newUrl }));
-    
+
     setEdits(prev => {
       const existingIndex = prev.findIndex(e => e.path === path);
       if (existingIndex > -1) {
@@ -199,15 +264,15 @@ export const EditHome: React.FC = () => {
     };
     const newItems = [...statsItems, newItem];
     setStatsItems(newItems);
-    
+
     // Track the entire stats array as JSON
     const originalStats = validSections.find(s => s.type === 'stats');
     trackEdit(
-      'stats.items', 
-      JSON.stringify(originalStats?.items || []), 
+      'stats.items',
+      JSON.stringify(originalStats?.items || []),
       JSON.stringify(newItems)
     );
-    
+
     toast.success('New stat added - Click Save to apply changes');
   };
 
@@ -216,19 +281,138 @@ export const EditHome: React.FC = () => {
       toast.error('Must have at least one stat');
       return;
     }
-    
+
     const newItems = statsItems.filter((_, idx) => idx !== index);
     setStatsItems(newItems);
-    
+
     // Track the entire stats array as JSON
     const originalStats = validSections.find(s => s.type === 'stats');
     trackEdit(
-      'stats.items', 
-      JSON.stringify(originalStats?.items || []), 
+      'stats.items',
+      JSON.stringify(originalStats?.items || []),
       JSON.stringify(newItems)
     );
-    
+
     toast.success('Stat removed - Click Save to apply changes');
+  };
+
+  // Videos Section helpers
+  const addVideoItem = () => {
+    const newItem = {
+      title: 'New Video',
+      description: 'Video description',
+      url: 'https://youtube.com/watch?v=...',
+      thumbnail: ''
+    };
+    const newItems = [...videosItems, newItem];
+    setVideosItems(newItems);
+    const originalVideos = validSections.find(s => s.type === 'videos');
+    trackEdit('videos.items', JSON.stringify(originalVideos?.items || []), JSON.stringify(newItems));
+    toast.success('Video added - Click Save to apply changes');
+  };
+
+  const removeVideoItem = (index: number) => {
+    if (videosItems.length <= 1) {
+      toast.error('Must have at least one video');
+      return;
+    }
+    const newItems = videosItems.filter((_, idx) => idx !== index);
+    setVideosItems(newItems);
+    const originalVideos = validSections.find(s => s.type === 'videos');
+    trackEdit('videos.items', JSON.stringify(originalVideos?.items || []), JSON.stringify(newItems));
+    toast.success('Video removed');
+  };
+
+  // Coaches Section helpers
+  const addCoachItem = () => {
+    const newItem = {
+      name: 'New Coach',
+      title: 'Expert Trainer',
+      bio: 'Coach biography',
+      image: '',
+      expertise: ''
+    };
+    const newItems = [...coachesItems, newItem];
+    setCoachesItems(newItems);
+    const originalCoaches = validSections.find(s => s.type === 'coaches' || s.type === 'instructors');
+    trackEdit('coaches.items', JSON.stringify(originalCoaches?.items || []), JSON.stringify(newItems));
+    toast.success('Coach added');
+  };
+
+  const removeCoachItem = (index: number) => {
+    const newItems = coachesItems.filter((_, idx) => idx !== index);
+    setCoachesItems(newItems);
+    const originalCoaches = validSections.find(s => s.type === 'coaches' || s.type === 'instructors');
+    trackEdit('coaches.items', JSON.stringify(originalCoaches?.items || []), JSON.stringify(newItems));
+    toast.success('Coach removed');
+  };
+
+  // Resources Section helpers
+  const addResourceItem = () => {
+    const newItem = {
+      title: 'New Resource',
+      description: 'Resource description',
+      fileUrl: '/uploads/resource.pdf',
+      fileType: 'PDF'
+    };
+    const newItems = [...resourcesItems, newItem];
+    setResourcesItems(newItems);
+    const originalResources = validSections.find(s => s.type === 'resources' || s.type === 'pdfs');
+    trackEdit('resources.items', JSON.stringify(originalResources?.items || []), JSON.stringify(newItems));
+    toast.success('Resource added');
+  };
+
+  const removeResourceItem = (index: number) => {
+    const newItems = resourcesItems.filter((_, idx) => idx !== index);
+    setResourcesItems(newItems);
+    const originalResources = validSections.find(s => s.type === 'resources' || s.type === 'pdfs');
+    trackEdit('resources.items', JSON.stringify(originalResources?.items || []), JSON.stringify(newItems));
+    toast.success('Resource removed');
+  };
+
+  // Testimonials Section helpers
+  const addTestimonialItem = () => {
+    const newItem = {
+      quote: 'Great training program!',
+      author: 'Student Name',
+      role: 'Graduate',
+      company: 'Company Name',
+      image: ''
+    };
+    const newItems = [...testimonialsItems, newItem];
+    setTestimonialsItems(newItems);
+    const originalTestimonials = validSections.find(s => s.type === 'testimonials');
+    trackEdit('testimonials.items', JSON.stringify(originalTestimonials?.items || []), JSON.stringify(newItems));
+    toast.success('Testimonial added');
+  };
+
+  const removeTestimonialItem = (index: number) => {
+    const newItems = testimonialsItems.filter((_, idx) => idx !== index);
+    setTestimonialsItems(newItems);
+    const originalTestimonials = validSections.find(s => s.type === 'testimonials');
+    trackEdit('testimonials.items', JSON.stringify(originalTestimonials?.items || []), JSON.stringify(newItems));
+    toast.success('Testimonial removed');
+  };
+
+  // FAQ Section helpers
+  const addFaqItem = () => {
+    const newItem = {
+      question: 'New Question?',
+      answer: 'Answer to the question'
+    };
+    const newItems = [...faqItems, newItem];
+    setFaqItems(newItems);
+    const originalFaq = validSections.find(s => s.type === 'faq');
+    trackEdit('faq.items', JSON.stringify(originalFaq?.items || []), JSON.stringify(newItems));
+    toast.success('FAQ added');
+  };
+
+  const removeFaqItem = (index: number) => {
+    const newItems = faqItems.filter((_, idx) => idx !== index);
+    setFaqItems(newItems);
+    const originalFaq = validSections.find(s => s.type === 'faq');
+    trackEdit('faq.items', JSON.stringify(originalFaq?.items || []), JSON.stringify(newItems));
+    toast.success('FAQ removed');
   };
 
   const handleLanguageChange = (langCode: string) => {
@@ -248,7 +432,7 @@ export const EditHome: React.FC = () => {
     }
 
     const allChanges = [...edits];
-    
+
     console.log('Saving changes:', allChanges);
 
     try {
@@ -257,29 +441,29 @@ export const EditHome: React.FC = () => {
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           pageId: parseInt(id),
           language: selectedLanguage,
-          changes: allChanges 
+          changes: allChanges
         })
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Save failed');
       }
-      
+
       const result = await response.json();
-      
+
       if (result.message?.includes('created')) {
         toast.success(`New ${selectedLanguage.toUpperCase()} translation created`);
       } else {
         toast.success(`Changes saved for ${selectedLanguage.toUpperCase()}`);
       }
-      
+
       setEdits([]);
       setImageEdits({});
-      
+
       // Reload data
       const reloadRes = await fetch(`${API_BASE}/api/pages/home?lang=${selectedLanguage}`);
       const reloadedData = await reloadRes.json();
@@ -306,7 +490,7 @@ export const EditHome: React.FC = () => {
       <div className="flex items-center justify-center h-screen bg-white">
         <div className="text-center">
           <p className="text-slate-900 font-medium mb-4">Page not found</p>
-          <button 
+          <button
             onClick={() => navigate('/admin/pages')}
             className="bg-slate-900 text-white px-6 py-2 rounded hover:bg-slate-800"
           >
@@ -323,20 +507,20 @@ export const EditHome: React.FC = () => {
 
   const parseSections = (): ContentSection[] => {
     const rawSectionsJson = data.contentSections || data.contentSectionsJson;
-    
+
     if (!rawSectionsJson) return [];
 
     try {
       let rawSections: any;
-      
+
       if (typeof rawSectionsJson === 'string') {
         rawSections = JSON.parse(rawSectionsJson);
       } else {
         rawSections = rawSectionsJson;
       }
-      
+
       if (!Array.isArray(rawSections)) return [];
-      
+
       const normalized = rawSections.map((s: any) => ({
         type: (s.Type || s.type || '').toLowerCase(),
         title: s.Title || s.title,
@@ -347,9 +531,9 @@ export const EditHome: React.FC = () => {
         items: s.Items || s.items,
         logos: s.Logos || s.logos
       }));
-      
+
       return normalized;
-      
+
     } catch (error) {
       console.error('Failed to parse sections:', error);
       return [];
@@ -452,17 +636,17 @@ export const EditHome: React.FC = () => {
 
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center overflow-hidden bg-white">
-        
+
         {/* Subtle Background Circles */}
         <div className="absolute top-20 right-10 w-96 h-96 bg-slate-100 rounded-full opacity-30 blur-3xl"></div>
         <div className="absolute bottom-20 left-10 w-[600px] h-[600px] bg-slate-50 rounded-full opacity-40 blur-3xl"></div>
-        
+
         {/* Red accent circle */}
         <div className="absolute top-40 right-32 w-32 h-32 bg-red-600 rounded-full opacity-5 blur-2xl"></div>
-        
+
         {/* Hero Image with Horizontal Fade */}
         {hero.image && (
-          <div 
+          <div
             className="absolute inset-0 flex items-center justify-center pointer-events-none"
             style={{
               maskImage: 'linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%)',
@@ -493,12 +677,12 @@ export const EditHome: React.FC = () => {
 
         <div className="container mx-auto px-8 py-20 relative z-10">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
-            
+
             {/* Left Content - Editable */}
             <div className="space-y-8">
               {/* Red accent line */}
               <div className="w-16 h-1 bg-red-600 mb-4"></div>
-              
+
               <RichTextEditor
                 value={heroTitle}
                 onChange={(value) => {
@@ -539,7 +723,7 @@ export const EditHome: React.FC = () => {
                     }}
                     className="mb-4 rounded p-1"
                   />
-                  
+
                   <div className="leading-relaxed">
                     <RichTextEditor
                       value={introDescription}
@@ -549,9 +733,9 @@ export const EditHome: React.FC = () => {
                       }}
                       className="rounded p-1 inline-block w-full"
                     />
-                    
+
                     <br />
-                    
+
                     <RichTextEditor
                       value={introName}
                       onChange={(value) => {
@@ -560,7 +744,7 @@ export const EditHome: React.FC = () => {
                       }}
                       className="font-medium mt-2 inline-block rounded p-1"
                     />
-                    
+
                     <RichTextEditor
                       value={introTitle}
                       onChange={(value) => {
@@ -591,11 +775,11 @@ export const EditHome: React.FC = () => {
                 className="tracking-tight rounded p-2 inline-block"
               />
             </div>
-            
+
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               {statsItems.map((stat: any, idx: number) => (
-                <div 
-                  key={idx} 
+                <div
+                  key={idx}
                   className="relative text-center p-6 bg-white border-t-2 border-red-600 rounded shadow-sm group"
                 >
                   {/* Remove button */}
@@ -611,12 +795,12 @@ export const EditHome: React.FC = () => {
                       ✕
                     </button>
                   )}
-                  
+
                   {/* DEBUG INFO */}
                   <div className="absolute top-2 left-2 text-xs text-slate-400">
                     Stat {idx}
                   </div>
-                  
+
                   {/* Value Editor - SIMPLIFIED */}
                   <div className="mb-4 relative z-0">
                     <label className="block text-xs text-slate-500 mb-1">Value (click to edit):</label>
@@ -633,8 +817,8 @@ export const EditHome: React.FC = () => {
                         onChange={(value) => {
                           console.log(`📝 Stat ${idx} value changed:`, value);
                           const newItems = [...statsItems];
-                          newItems[idx] = { 
-                            ...newItems[idx], 
+                          newItems[idx] = {
+                            ...newItems[idx],
                             value: value
                           };
                           setStatsItems(newItems);
@@ -645,7 +829,7 @@ export const EditHome: React.FC = () => {
                       />
                     </div>
                   </div>
-                  
+
                   {/* Label Editor - SIMPLIFIED */}
                   <div className="relative z-0">
                     <label className="block text-xs text-slate-500 mb-1">Label (click to edit):</label>
@@ -662,8 +846,8 @@ export const EditHome: React.FC = () => {
                         onChange={(value) => {
                           console.log(`📝 Stat ${idx} label changed:`, value);
                           const newItems = [...statsItems];
-                          newItems[idx] = { 
-                            ...newItems[idx], 
+                          newItems[idx] = {
+                            ...newItems[idx],
                             label: value
                           };
                           setStatsItems(newItems);
@@ -677,7 +861,7 @@ export const EditHome: React.FC = () => {
                 </div>
               ))}
             </div>
-            
+
             {/* Add New Stat Button */}
             <div className="text-center mt-8">
               <button
@@ -692,13 +876,529 @@ export const EditHome: React.FC = () => {
         </section>
       )}
 
+      {/* Videos Section - Editable */}
+      <section className="py-16 bg-white border-t border-slate-200">
+        <div className="container mx-auto px-8">
+          <div className="text-center mb-12">
+            <div className="w-16 h-1 bg-red-600 mx-auto mb-6"></div>
+            <RichTextEditor
+              value={videosTitle}
+              onChange={(value) => {
+                setVideosTitle(value);
+                trackEdit('videos.title', '', value);
+              }}
+              className="text-3xl font-light tracking-tight rounded p-2 inline-block mb-4"
+              placeholder="Videos Section Title"
+            />
+            <RichTextEditor
+              value={videosSubtitle}
+              onChange={(value) => {
+                setVideosSubtitle(value);
+                trackEdit('videos.subtitle', '', value);
+              }}
+              className="text-slate-600 rounded p-2 inline-block"
+              placeholder="Videos Section Subtitle"
+            />
+          </div>
 
-      {/* Featured Programs Section Header - Editable */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {videosItems.map((video: any, idx: number) => (
+              <div key={idx} className="bg-white border-2 border-slate-200 rounded-lg overflow-hidden hover:border-red-400 transition-border relative group">
+                <button
+                  onClick={() => removeVideoItem(idx)}
+                  className="absolute top-2 right-2 z-10 bg-red-600 text-white w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
+                  title="Remove video"
+                >
+                  ×
+                </button>
+
+                <div className="relative h-48 bg-slate-100 flex items-center justify-center">
+                  <RichTextEditor
+                    value={video.thumbnail || ''}
+                    onChange={(value) => {
+                      const newItems = [...videosItems];
+                      newItems[idx] = { ...newItems[idx], thumbnail: value };
+                      setVideosItems(newItems);
+                      trackEdit(`videos.items.${idx}.thumbnail`, '', value);
+                    }}
+                    className="text-xs text-slate-500 p-2"
+                    placeholder="Thumbnail URL"
+                  />
+                </div>
+
+                <div className="p-6 space-y-3">
+                  <RichTextEditor
+                    value={video.title || ''}
+                    onChange={(value) => {
+                      const newItems = [...videosItems];
+                      newItems[idx] = { ...newItems[idx], title: value };
+                      setVideosItems(newItems);
+                      trackEdit(`videos.items.${idx}.title`, '', value);
+                    }}
+                    className="font-semibold text-lg"
+                    placeholder="Video Title"
+                  />
+
+                  <RichTextEditor
+                    value={video.description || ''}
+                    onChange={(value) => {
+                      const newItems = [...videosItems];
+                      newItems[idx] = { ...newItems[idx], description: value };
+                      setVideosItems(newItems);
+                      trackEdit(`videos.items.${idx}.description`, '', value);
+                    }}
+                    className="text-slate-600 text-sm"
+                    placeholder="Video Description"
+                  />
+
+                  <RichTextEditor
+                    value={video.url || ''}
+                    onChange={(value) => {
+                      const newItems = [...videosItems];
+                      newItems[idx] = { ...newItems[idx], url: value };
+                      setVideosItems(newItems);
+                      trackEdit(`videos.items.${idx}.url`, '', value);
+                    }}
+                    className="text-red-600 text-sm"
+                    placeholder="Video URL"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-8">
+            <button
+              onClick={addVideoItem}
+              className="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors flex items-center gap-2 mx-auto"
+            >
+              <span className="text-xl">+</span>
+              Add New Video
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Coaches Section - Editable */}
+      <section className="py-16 bg-slate-50 border-t border-slate-200">
+        <div className="container mx-auto px-8">
+          <div className="text-center mb-12">
+            <div className="w-16 h-1 bg-red-600 mx-auto mb-6"></div>
+            <RichTextEditor
+              value={coachesTitle}
+              onChange={(value) => {
+                setCoachesTitle(value);
+                trackEdit('coaches.title', '', value);
+              }}
+              className="text-3xl font-light tracking-tight rounded p-2 inline-block mb-4"
+              placeholder="Coaches Section Title"
+            />
+            <RichTextEditor
+              value={coachesSubtitle}
+              onChange={(value) => {
+                setCoachesSubtitle(value);
+                trackEdit('coaches.subtitle', '', value);
+              }}
+              className="text-slate-600 rounded p-2 inline-block"
+              placeholder="Coaches Section Subtitle"
+            />
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {coachesItems.map((coach: any, idx: number) => (
+              <div key={idx} className="bg-white border-2 border-slate-200 rounded-lg overflow-hidden hover:border-red-400 transition-border relative group">
+                <button
+                  onClick={() => removeCoachItem(idx)}
+                  className="absolute top-2 right-2 z-10 bg-red-600 text-white w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
+                  title="Remove coach"
+                >
+                  ×
+                </button>
+
+                <div className="relative h-64 bg-slate-100 flex items-center justify-center">
+                  <RichTextEditor
+                    value={coach.image || ''}
+                    onChange={(value) => {
+                      const newItems = [...coachesItems];
+                      newItems[idx] = { ...newItems[idx], image: value };
+                      setCoachesItems(newItems);
+                      trackEdit(`coaches.items.${idx}.image`, '', value);
+                    }}
+                    className="text-xs text-slate-500 p-2"
+                    placeholder="Coach Image URL"
+                  />
+                </div>
+
+                <div className="p-6 space-y-3">
+                  <RichTextEditor
+                    value={coach.name || ''}
+                    onChange={(value) => {
+                      const newItems = [...coachesItems];
+                      newItems[idx] = { ...newItems[idx], name: value };
+                      setCoachesItems(newItems);
+                      trackEdit(`coaches.items.${idx}.name`, '', value);
+                    }}
+                    className="font-semibold text-lg"
+                    placeholder="Coach Name"
+                  />
+
+                  <RichTextEditor
+                    value={coach.title || ''}
+                    onChange={(value) => {
+                      const newItems = [...coachesItems];
+                      newItems[idx] = { ...newItems[idx], title: value };
+                      setCoachesItems(newItems);
+                      trackEdit(`coaches.items.${idx}.title`, '', value);
+                    }}
+                    className="text-red-600 font-medium text-sm"
+                    placeholder="Coach Title/Position"
+                  />
+
+                  <RichTextEditor
+                    value={coach.bio || ''}
+                    onChange={(value) => {
+                      const newItems = [...coachesItems];
+                      newItems[idx] = { ...newItems[idx], bio: value };
+                      setCoachesItems(newItems);
+                      trackEdit(`coaches.items.${idx}.bio`, '', value);
+                    }}
+                    className="text-slate-600 text-sm"
+                    placeholder="Coach Bio"
+                  />
+
+                  <RichTextEditor
+                    value={coach.expertise || ''}
+                    onChange={(value) => {
+                      const newItems = [...coachesItems];
+                      newItems[idx] = { ...newItems[idx], expertise: value };
+                      setCoachesItems(newItems);
+                      trackEdit(`coaches.items.${idx}.expertise`, '', value);
+                    }}
+                    className="text-xs text-slate-500"
+                    placeholder="Coach Expertise"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-8">
+            <button
+              onClick={addCoachItem}
+              className="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors flex items-center gap-2 mx-auto"
+            >
+              <span className="text-xl">+</span>
+              Add New Coach
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Resources Section - Editable */}
+      <section className="py-16 bg-white border-t border-slate-200">
+        <div className="container mx-auto px-8">
+          <div className="text-center mb-12">
+            <div className="w-16 h-1 bg-red-600 mx-auto mb-6"></div>
+            <RichTextEditor
+              value={resourcesTitle}
+              onChange={(value) => {
+                setResourcesTitle(value);
+                trackEdit('resources.title', '', value);
+              }}
+              className="text-3xl font-light tracking-tight rounded p-2 inline-block mb-4"
+              placeholder="Resources Section Title"
+            />
+            <RichTextEditor
+              value={resourcesSubtitle}
+              onChange={(value) => {
+                setResourcesSubtitle(value);
+                trackEdit('resources.subtitle', '', value);
+              }}
+              className="text-slate-600 rounded p-2 inline-block"
+              placeholder="Resources Section Subtitle"
+            />
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {resourcesItems.map((resource: any, idx: number) => (
+              <div key={idx} className="bg-slate-50 border-2 border-slate-200 rounded-lg p-6 hover:border-red-400 transition-border relative group">
+                <button
+                  onClick={() => removeResourceItem(idx)}
+                  className="absolute top-2 right-2 z-10 bg-red-600 text-white w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
+                  title="Remove resource"
+                >
+                  ×
+                </button>
+
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center">
+                    <RichTextEditor
+                      value={resource.fileType || 'PDF'}
+                      onChange={(value) => {
+                        const newItems = [...resourcesItems];
+                        newItems[idx] = { ...newItems[idx], fileType: value };
+                        setResourcesItems(newItems);
+                        trackEdit(`resources.items.${idx}.fileType`, '', value);
+                      }}
+                      className="text-white font-bold text-xs text-center"
+                      placeholder="PDF"
+                    />
+                  </div>
+
+                  <div className="flex-1 space-y-2">
+                    <RichTextEditor
+                      value={resource.title || ''}
+                      onChange={(value) => {
+                        const newItems = [...resourcesItems];
+                        newItems[idx] = { ...newItems[idx], title: value };
+                        setResourcesItems(newItems);
+                        trackEdit(`resources.items.${idx}.title`, '', value);
+                      }}
+                      className="font-semibold text-slate-900"
+                      placeholder="Resource Title"
+                    />
+
+                    <RichTextEditor
+                      value={resource.description || ''}
+                      onChange={(value) => {
+                        const newItems = [...resourcesItems];
+                        newItems[idx] = { ...newItems[idx], description: value };
+                        setResourcesItems(newItems);
+                        trackEdit(`resources.items.${idx}.description`, '', value);
+                      }}
+                      className="text-sm text-slate-600"
+                      placeholder="Resource Description"
+                    />
+
+                    <RichTextEditor
+                      value={resource.fileUrl || ''}
+                      onChange={(value) => {
+                        const newItems = [...resourcesItems];
+                        newItems[idx] = { ...newItems[idx], fileUrl: value };
+                        setResourcesItems(newItems);
+                        trackEdit(`resources.items.${idx}.fileUrl`, '', value);
+                      }}
+                      className="text-xs text-red-600"
+                      placeholder="File URL"
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-8">
+            <button
+              onClick={addResourceItem}
+              className="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors flex items-center gap-2 mx-auto"
+            >
+              <span className="text-xl">+</span>
+              Add New Resource
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section - Editable */}
+      <section className="py-16 bg-slate-50 border-t border-slate-200">
+        <div className="container mx-auto px-8">
+          <div className="text-center mb-12">
+            <div className="w-16 h-1 bg-red-600 mx-auto mb-6"></div>
+            <RichTextEditor
+              value={testimonialsTitle}
+              onChange={(value) => {
+                setTestimonialsTitle(value);
+                trackEdit('testimonials.title', '', value);
+              }}
+              className="text-3xl font-light tracking-tight rounded p-2 inline-block mb-4"
+              placeholder="Testimonials Section Title"
+            />
+            <RichTextEditor
+              value={testimonialsSubtitle}
+              onChange={(value) => {
+                setTestimonialsSubtitle(value);
+                trackEdit('testimonials.subtitle', '', value);
+              }}
+              className="text-slate-600 rounded p-2 inline-block"
+              placeholder="Testimonials Section Subtitle"
+            />
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {testimonialsItems.map((testimonial: any, idx: number) => (
+              <div key={idx} className="bg-white border-2 border-slate-200 rounded-lg p-6 hover:border-red-400 transition-border relative group">
+                <button
+                  onClick={() => removeTestimonialItem(idx)}
+                  className="absolute top-2 right-2 z-10 bg-red-600 text-white w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
+                  title="Remove testimonial"
+                >
+                  ×
+                </button>
+
+                <div className="space-y-4">
+                  <RichTextEditor
+                    value={testimonial.quote || ''}
+                    onChange={(value) => {
+                      const newItems = [...testimonialsItems];
+                      newItems[idx] = { ...newItems[idx], quote: value };
+                      setTestimonialsItems(newItems);
+                      trackEdit(`testimonials.items.${idx}.quote`, '', value);
+                    }}
+                    className="text-slate-900 italic mb-4"
+                    placeholder="Testimonial Quote"
+                  />
+
+                  <div className="flex items-center gap-4">
+                    <RichTextEditor
+                      value={testimonial.image || ''}
+                      onChange={(value) => {
+                        const newItems = [...testimonialsItems];
+                        newItems[idx] = { ...newItems[idx], image: value };
+                        setTestimonialsItems(newItems);
+                        trackEdit(`testimonials.items.${idx}.image`, '', value);
+                      }}
+                      className="text-xs text-slate-500"
+                      placeholder="Image URL"
+                    />
+
+                    <div className="flex-1 space-y-2">
+                      <RichTextEditor
+                        value={testimonial.author || ''}
+                        onChange={(value) => {
+                          const newItems = [...testimonialsItems];
+                          newItems[idx] = { ...newItems[idx], author: value };
+                          setTestimonialsItems(newItems);
+                          trackEdit(`testimonials.items.${idx}.author`, '', value);
+                        }}
+                        className="font-semibold"
+                        placeholder="Author Name"
+                      />
+
+                      <RichTextEditor
+                        value={testimonial.role || ''}
+                        onChange={(value) => {
+                          const newItems = [...testimonialsItems];
+                          newItems[idx] = { ...newItems[idx], role: value };
+                          setTestimonialsItems(newItems);
+                          trackEdit(`testimonials.items.${idx}.role`, '', value);
+                        }}
+                        className="text-sm text-slate-600"
+                        placeholder="Role/Position"
+                      />
+
+                      <RichTextEditor
+                        value={testimonial.company || ''}
+                        onChange={(value) => {
+                          const newItems = [...testimonialsItems];
+                          newItems[idx] = { ...newItems[idx], company: value };
+                          setTestimonialsItems(newItems);
+                          trackEdit(`testimonials.items.${idx}.company`, '', value);
+                        }}
+                        className="text-xs text-slate-500"
+                        placeholder="Company"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-8">
+            <button
+              onClick={addTestimonialItem}
+              className="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors flex items-center gap-2 mx-auto"
+            >
+              <span className="text-xl">+</span>
+              Add New Testimonial
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section - Editable */}
+      <section className="py-16 bg-white border-t border-slate-200">
+        <div className="container mx-auto px-8">
+          <div className="text-center mb-12">
+            <div className="w-16 h-1 bg-red-600 mx-auto mb-6"></div>
+            <RichTextEditor
+              value={faqTitle}
+              onChange={(value) => {
+                setFaqTitle(value);
+                trackEdit('faq.title', '', value);
+              }}
+              className="text-3xl font-light tracking-tight rounded p-2 inline-block mb-4"
+              placeholder="FAQ Section Title"
+            />
+            <RichTextEditor
+              value={faqSubtitle}
+              onChange={(value) => {
+                setFaqSubtitle(value);
+                trackEdit('faq.subtitle', '', value);
+              }}
+              className="text-slate-600 rounded p-2 inline-block"
+              placeholder="FAQ Section Subtitle"
+            />
+          </div>
+
+          <div className="max-w-3xl mx-auto space-y-4">
+            {faqItems.map((item: any, idx: number) => (
+              <div key={idx} className="bg-white border-2 border-slate-200 rounded-lg overflow-hidden hover:border-red-400 transition-border relative group">
+                <button
+                  onClick={() => removeFaqItem(idx)}
+                  className="absolute top-2 right-2 z-10 bg-red-600 text-white w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
+                  title="Remove FAQ item"
+                >
+                  ×
+                </button>
+
+                <div className="p-6 space-y-3">
+                  <RichTextEditor
+                    value={item.question || ''}
+                    onChange={(value) => {
+                      const newItems = [...faqItems];
+                      newItems[idx] = { ...newItems[idx], question: value };
+                      setFaqItems(newItems);
+                      trackEdit(`faq.items.${idx}.question`, '', value);
+                    }}
+                    className="font-medium text-slate-900"
+                    placeholder="Question"
+                  />
+
+                  <RichTextEditor
+                    value={item.answer || ''}
+                    onChange={(value) => {
+                      const newItems = [...faqItems];
+                      newItems[idx] = { ...newItems[idx], answer: value };
+                      setFaqItems(newItems);
+                      trackEdit(`faq.items.${idx}.answer`, '', value);
+                    }}
+                    className="text-slate-600"
+                    placeholder="Answer"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-8">
+            <button
+              onClick={addFaqItem}
+              className="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors flex items-center gap-2 mx-auto"
+            >
+              <span className="text-xl">+</span>
+              Add New FAQ
+            </button>
+          </div>
+        </div>
+      </section>
+
+
       <section className="py-16 bg-white border-t border-slate-200">
         <div className="container mx-auto px-8">
           <div className="text-center mb-8">
             <div className="w-16 h-1 bg-red-600 mx-auto mb-6"></div>
-            
+
             <RichTextEditor
               value={featuredTitle}
               onChange={(value) => {
@@ -708,7 +1408,7 @@ export const EditHome: React.FC = () => {
               className="tracking-tight rounded p-2 inline-block mb-4"
               placeholder="Featured Programs Title"
             />
-            
+
             <RichTextEditor
               value={featuredSubtitle}
               onChange={(value) => {
@@ -719,7 +1419,7 @@ export const EditHome: React.FC = () => {
               placeholder="Featured Programs Subtitle"
             />
           </div>
-          
+
           <div className="bg-blue-50 border border-blue-200 rounded p-6 text-center">
             <p className="text-sm text-blue-800">
               💡 <strong>Programs are managed separately.</strong> Go to <button onClick={() => navigate('/admin/programs')} className="underline hover:text-blue-900">Programs Management</button> to add, edit, or publish programs.
@@ -747,10 +1447,10 @@ export const EditHome: React.FC = () => {
             <li>• <strong>Change image:</strong> Click "Hero Image" button at top center</li>
             <li>• <strong>Save:</strong> Click "Save Changes" in the top bar</li>
           </ul>
-          
+
           <div className="mt-4 pt-4 border-t border-slate-200">
             <p className="text-xs text-slate-500">
-              Page ID: {id} • Language: {selectedLanguage} • 
+              Page ID: {id} • Language: {selectedLanguage} •
               Pending edits: {edits.length}
             </p>
           </div>
