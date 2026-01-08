@@ -2,8 +2,10 @@ import { useEffect, useState, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { ImageUpload } from '../components/ImageUpload';
-import { RichTextEditor } from '../components/RichTextEditor';
+import { ImageUpload } from '../Components/ImageUpload';
+import { RichTextEditor } from '../Components/RichTextEditor';
+import { useEditor } from '../../contexts/EditorContext';
+import { FileUpload } from '../Components/FileUpload';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://localhost:7062';
 
@@ -48,6 +50,7 @@ interface PageData {
 }
 
 export const EditHome: React.FC = () => {
+  const { isSidebarOpen } = useEditor();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [data, setData] = useState<PageData | null>(null);
@@ -562,7 +565,7 @@ export const EditHome: React.FC = () => {
 
       {/* Sticky Save Bar */}
       {edits.length > 0 && (
-        <div className="fixed top-0 left-0 right-0 bg-slate-900 text-white p-3 shadow-lg z-50 border-b border-slate-700">
+        <div className={`fixed top-0 left-0 bg-slate-900 text-white p-3 shadow-lg z-50 border-b border-slate-700 transition-all duration-300 ${isSidebarOpen ? 'right-80' : 'right-16'}`}>
           <div className="max-w-7xl mx-auto flex justify-between items-center">
             <div className="flex items-center gap-3">
               <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
@@ -822,7 +825,9 @@ export const EditHome: React.FC = () => {
                             value: value
                           };
                           setStatsItems(newItems);
-                          trackEdit(`stats.items.${idx}.value`, stat.value || stat.Value || '', value);
+                          // Track the entire stats array to ensure saving works
+                          const originalStats = validSections.find(s => s.type === 'stats');
+                          trackEdit('stats.items', JSON.stringify(originalStats?.items || []), JSON.stringify(newItems));
                         }}
                         className=""
                         placeholder="Click to edit value"
@@ -851,7 +856,9 @@ export const EditHome: React.FC = () => {
                             label: value
                           };
                           setStatsItems(newItems);
-                          trackEdit(`stats.items.${idx}.label`, stat.label || stat.Label || '', value);
+                          // Track the entire stats array to ensure saving works
+                          const originalStats = validSections.find(s => s.type === 'stats');
+                          trackEdit('stats.items', JSON.stringify(originalStats?.items || []), JSON.stringify(newItems));
                         }}
                         className=""
                         placeholder="Click to edit label"
@@ -913,22 +920,22 @@ export const EditHome: React.FC = () => {
                 </button>
 
                 <div className="relative h-48 bg-slate-100 flex items-center justify-center">
-                  <RichTextEditor
-                    value={video.thumbnail || ''}
-                    onChange={(value) => {
+                  <ImageUpload
+                    currentImageUrl={video.thumbnail || video.Thumbnail || ''}
+                    onImageChange={(value) => {
                       const newItems = [...videosItems];
                       newItems[idx] = { ...newItems[idx], thumbnail: value };
                       setVideosItems(newItems);
                       trackEdit(`videos.items.${idx}.thumbnail`, '', value);
                     }}
-                    className="text-xs text-slate-500 p-2"
-                    placeholder="Thumbnail URL"
+                    label="Video Thumbnail"
+                    aspectRatio="16/9"
                   />
                 </div>
 
                 <div className="p-6 space-y-3">
                   <RichTextEditor
-                    value={video.title || ''}
+                    value={video.title || video.Title || ''}
                     onChange={(value) => {
                       const newItems = [...videosItems];
                       newItems[idx] = { ...newItems[idx], title: value };
@@ -940,7 +947,7 @@ export const EditHome: React.FC = () => {
                   />
 
                   <RichTextEditor
-                    value={video.description || ''}
+                    value={video.description || video.Description || ''}
                     onChange={(value) => {
                       const newItems = [...videosItems];
                       newItems[idx] = { ...newItems[idx], description: value };
@@ -952,7 +959,7 @@ export const EditHome: React.FC = () => {
                   />
 
                   <RichTextEditor
-                    value={video.url || ''}
+                    value={video.url || video.Url || ''}
                     onChange={(value) => {
                       const newItems = [...videosItems];
                       newItems[idx] = { ...newItems[idx], url: value };
@@ -1016,22 +1023,22 @@ export const EditHome: React.FC = () => {
                 </button>
 
                 <div className="relative h-64 bg-slate-100 flex items-center justify-center">
-                  <RichTextEditor
-                    value={coach.image || ''}
-                    onChange={(value) => {
+                  <ImageUpload
+                    currentImageUrl={coach.image || coach.Image || ''}
+                    onImageChange={(value) => {
                       const newItems = [...coachesItems];
                       newItems[idx] = { ...newItems[idx], image: value };
                       setCoachesItems(newItems);
                       trackEdit(`coaches.items.${idx}.image`, '', value);
                     }}
-                    className="text-xs text-slate-500 p-2"
-                    placeholder="Coach Image URL"
+                    label="Coach Photo"
+                    aspectRatio="3/4"
                   />
                 </div>
 
                 <div className="p-6 space-y-3">
                   <RichTextEditor
-                    value={coach.name || ''}
+                    value={coach.name || coach.Name || ''}
                     onChange={(value) => {
                       const newItems = [...coachesItems];
                       newItems[idx] = { ...newItems[idx], name: value };
@@ -1043,7 +1050,7 @@ export const EditHome: React.FC = () => {
                   />
 
                   <RichTextEditor
-                    value={coach.title || ''}
+                    value={coach.title || coach.Title || ''}
                     onChange={(value) => {
                       const newItems = [...coachesItems];
                       newItems[idx] = { ...newItems[idx], title: value };
@@ -1055,7 +1062,7 @@ export const EditHome: React.FC = () => {
                   />
 
                   <RichTextEditor
-                    value={coach.bio || ''}
+                    value={coach.bio || coach.Bio || ''}
                     onChange={(value) => {
                       const newItems = [...coachesItems];
                       newItems[idx] = { ...newItems[idx], bio: value };
@@ -1067,7 +1074,7 @@ export const EditHome: React.FC = () => {
                   />
 
                   <RichTextEditor
-                    value={coach.expertise || ''}
+                    value={coach.expertise || coach.Expertise || ''}
                     onChange={(value) => {
                       const newItems = [...coachesItems];
                       newItems[idx] = { ...newItems[idx], expertise: value };
@@ -1133,7 +1140,7 @@ export const EditHome: React.FC = () => {
                 <div className="flex items-start gap-4">
                   <div className="flex-shrink-0 w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center">
                     <RichTextEditor
-                      value={resource.fileType || 'PDF'}
+                      value={resource.fileType || resource.FileType || 'PDF'}
                       onChange={(value) => {
                         const newItems = [...resourcesItems];
                         newItems[idx] = { ...newItems[idx], fileType: value };
@@ -1147,7 +1154,7 @@ export const EditHome: React.FC = () => {
 
                   <div className="flex-1 space-y-2">
                     <RichTextEditor
-                      value={resource.title || ''}
+                      value={resource.title || resource.Title || ''}
                       onChange={(value) => {
                         const newItems = [...resourcesItems];
                         newItems[idx] = { ...newItems[idx], title: value };
@@ -1159,7 +1166,7 @@ export const EditHome: React.FC = () => {
                     />
 
                     <RichTextEditor
-                      value={resource.description || ''}
+                      value={resource.description || resource.Description || ''}
                       onChange={(value) => {
                         const newItems = [...resourcesItems];
                         newItems[idx] = { ...newItems[idx], description: value };
@@ -1170,16 +1177,16 @@ export const EditHome: React.FC = () => {
                       placeholder="Resource Description"
                     />
 
-                    <RichTextEditor
-                      value={resource.fileUrl || ''}
-                      onChange={(value) => {
+                    <FileUpload
+                      currentFileUrl={resource.fileUrl || resource.FileUrl || ''}
+                      onFileChange={(value) => {
                         const newItems = [...resourcesItems];
                         newItems[idx] = { ...newItems[idx], fileUrl: value };
+                        // Auto-detect type if possible logic could go here, or just let user edit type
                         setResourcesItems(newItems);
                         trackEdit(`resources.items.${idx}.fileUrl`, '', value);
                       }}
-                      className="text-xs text-red-600"
-                      placeholder="File URL"
+                      label="Document File"
                     />
                   </div>
                 </div>
@@ -1237,7 +1244,7 @@ export const EditHome: React.FC = () => {
 
                 <div className="space-y-4">
                   <RichTextEditor
-                    value={testimonial.quote || ''}
+                    value={testimonial.quote || testimonial.Quote || ''}
                     onChange={(value) => {
                       const newItems = [...testimonialsItems];
                       newItems[idx] = { ...newItems[idx], quote: value };
@@ -1249,21 +1256,23 @@ export const EditHome: React.FC = () => {
                   />
 
                   <div className="flex items-center gap-4">
-                    <RichTextEditor
-                      value={testimonial.image || ''}
-                      onChange={(value) => {
-                        const newItems = [...testimonialsItems];
-                        newItems[idx] = { ...newItems[idx], image: value };
-                        setTestimonialsItems(newItems);
-                        trackEdit(`testimonials.items.${idx}.image`, '', value);
-                      }}
-                      className="text-xs text-slate-500"
-                      placeholder="Image URL"
-                    />
+                    <div className="w-24">
+                      <ImageUpload
+                        currentImageUrl={testimonial.image || testimonial.Image || ''}
+                        onImageChange={(value) => {
+                          const newItems = [...testimonialsItems];
+                          newItems[idx] = { ...newItems[idx], image: value };
+                          setTestimonialsItems(newItems);
+                          trackEdit(`testimonials.items.${idx}.image`, '', value);
+                        }}
+                        label="Photo"
+                        aspectRatio="1/1"
+                      />
+                    </div>
 
                     <div className="flex-1 space-y-2">
                       <RichTextEditor
-                        value={testimonial.author || ''}
+                        value={testimonial.author || testimonial.Author || ''}
                         onChange={(value) => {
                           const newItems = [...testimonialsItems];
                           newItems[idx] = { ...newItems[idx], author: value };
@@ -1275,7 +1284,7 @@ export const EditHome: React.FC = () => {
                       />
 
                       <RichTextEditor
-                        value={testimonial.role || ''}
+                        value={testimonial.role || testimonial.Role || ''}
                         onChange={(value) => {
                           const newItems = [...testimonialsItems];
                           newItems[idx] = { ...newItems[idx], role: value };
@@ -1287,7 +1296,7 @@ export const EditHome: React.FC = () => {
                       />
 
                       <RichTextEditor
-                        value={testimonial.company || ''}
+                        value={testimonial.company || testimonial.Company || ''}
                         onChange={(value) => {
                           const newItems = [...testimonialsItems];
                           newItems[idx] = { ...newItems[idx], company: value };
@@ -1354,7 +1363,7 @@ export const EditHome: React.FC = () => {
 
                 <div className="p-6 space-y-3">
                   <RichTextEditor
-                    value={item.question || ''}
+                    value={item.question || item.Question || ''}
                     onChange={(value) => {
                       const newItems = [...faqItems];
                       newItems[idx] = { ...newItems[idx], question: value };
@@ -1366,7 +1375,7 @@ export const EditHome: React.FC = () => {
                   />
 
                   <RichTextEditor
-                    value={item.answer || ''}
+                    value={item.answer || item.Answer || ''}
                     onChange={(value) => {
                       const newItems = [...faqItems];
                       newItems[idx] = { ...newItems[idx], answer: value };

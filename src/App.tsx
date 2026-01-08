@@ -6,12 +6,14 @@ import { Layout } from './components/layout/Layout';
 import { Home } from './pages/Home';
 import { LanguageProvider } from './contexts/LanguageContext';
 import LogoImage from '../public/know-how-logo.png';
-import { Menu, X, ChevronLeft, LayoutDashboard, Image, Users } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 
 // ADMIN PAGES
 import { AdminPagesList } from './Admin/pages/AdminPagesList';
 import { EditHome } from './Admin/Pages/EditHome';
 import { useState } from 'react';
+import { EditorProvider, useEditor } from './contexts/EditorContext';
+import { AdminSidebar } from './Admin/Components/AdminSidebar';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -47,7 +49,7 @@ const AdminLoginPage: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800 p-4">
       <div className="bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl p-8 w-full max-w-md border border-white/20">
         <div className="text-center mb-8">
-          <img 
+          <img
             src={LogoImage}
             alt='know-how-logo'
             width={'100px'}
@@ -87,99 +89,21 @@ const AdminLoginPage: React.FC = () => {
   );
 };
 
-// Admin Layout with Outlet
+// Admin Layout with Right Sidebar
 const AdminLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const { isSidebarOpen } = useEditor(); // Now works because EditorProvider wraps this component
 
   const canGoBack = location.pathname !== '/admin/pages';
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
-      {/* Sidebar - Collapsible */}
-      <div 
-        className={`bg-white shadow-lg border-r border-slate-200 fixed h-screen transition-all duration-300 ${
-          isSidebarCollapsed ? 'w-20' : 'w-64'
-        }`}
-      >
-        {/* Logo Section */}
-        <div className={`p-6 border-b border-slate-200 flex items-center justify-between ${
-          isSidebarCollapsed ? 'justify-center' : ''
-        }`}>
-          {!isSidebarCollapsed && (
-            <div className="flex items-center gap-3">
-              <img 
-                src={LogoImage} 
-                alt='know-how-logo' 
-                className="w-12 h-12 object-contain"
-              />
-              <div>
-                <h3 className="text-lg font-bold text-slate-900">KnowHow</h3>
-                <p className="text-xs text-slate-500">Admin Panel</p>
-              </div>
-            </div>
-          )}
-          {isSidebarCollapsed && (
-            <img 
-              src={LogoImage} 
-              alt='know-how-logo' 
-              className="w-10 h-10 object-contain"
-            />
-          )}
-        </div>
 
-        {/* Navigation */}
-        <nav className="p-4 space-y-2">
-          <a 
-            href="/admin/pages" 
-            className={`flex items-center gap-3 p-3 rounded-xl text-slate-700 hover:bg-slate-100 hover:text-slate-900 font-medium transition-all ${
-              location.pathname.includes('/admin/pages') ? 'bg-red-50 text-red-700' : ''
-            } ${isSidebarCollapsed ? 'justify-center' : ''}`}
-            title="Pages"
-          >
-            <LayoutDashboard className="w-5 h-5" />
-            {!isSidebarCollapsed && <span>Pages</span>}
-          </a>
-          <a 
-            href="#" 
-            className={`flex items-center gap-3 p-3 rounded-xl text-slate-400 cursor-not-allowed ${
-              isSidebarCollapsed ? 'justify-center' : ''
-            }`}
-            title="Media"
-          >
-            <Image className="w-5 h-5" />
-            {!isSidebarCollapsed && <span>Media</span>}
-          </a>
-          <a 
-            href="#" 
-            className={`flex items-center gap-3 p-3 rounded-xl text-slate-400 cursor-not-allowed ${
-              isSidebarCollapsed ? 'justify-center' : ''
-            }`}
-            title="Users"
-          >
-            <Users className="w-5 h-5" />
-            {!isSidebarCollapsed && <span>Users</span>}
-          </a>
-        </nav>
-
-        {/* Collapse Toggle Button */}
-        <div className={`absolute bottom-6 ${isSidebarCollapsed ? 'left-1/2 -translate-x-1/2' : 'left-6'}`}>
-          <button
-            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
-            title={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            {isSidebarCollapsed ? <Menu className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
-          </button>
-        </div>
-      </div>
-
-      {/* Main Content - Adjusts based on sidebar */}
-      <div 
-        className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${
-          isSidebarCollapsed ? 'ml-20' : 'ml-64'
-        }`}
+      {/* Main Content - Adjusts based on sidebar width */}
+      <div
+        className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ease-in-out ${isSidebarOpen ? 'mr-80' : 'mr-16'
+          }`}
       >
         {/* Top Bar with Back Button */}
         <header className="bg-white shadow-sm border-b border-slate-200 px-6 py-4 sticky top-0 z-40">
@@ -194,12 +118,12 @@ const AdminLayout: React.FC = () => {
                   <ChevronLeft className="w-5 h-5" />
                 </button>
               )}
-              
+
               <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
             </div>
-            
+
             <div className="flex items-center gap-4">
-              <button 
+              <button
                 onClick={() => {
                   localStorage.removeItem('adminToken');
                   navigate('/admin/login');
@@ -218,6 +142,9 @@ const AdminLayout: React.FC = () => {
           <Outlet />
         </main>
       </div>
+
+      {/* Right Sidebar */}
+      <AdminSidebar />
     </div>
   );
 };
@@ -231,16 +158,18 @@ function App() {
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<Layout><Home /></Layout>} />
-              
+
               {/* Admin Login */}
               <Route path="/admin/login" element={<AdminLoginPage />} />
-              
+
               {/* Protected Admin Routes with Layout */}
-              <Route 
-                path="/admin" 
+              <Route
+                path="/admin"
                 element={
                   <ProtectedRoute>
-                    <AdminLayout />
+                    <EditorProvider>
+                      <AdminLayout />
+                    </EditorProvider>
                   </ProtectedRoute>
                 }
               >

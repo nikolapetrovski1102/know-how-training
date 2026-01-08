@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import type { ContentSection, PageData } from '../Types/page';
 import { useLanguage } from '../contexts/LanguageContext';
+import { getImageUrl } from '../utils/imageHelper';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://localhost:7062';
 
@@ -96,6 +97,7 @@ export const Home: React.FC = () => {
   // New section types
   const videos = validSections.find((s: ContentSection) => s.type === 'videos');
   const coaches = validSections.find((s: ContentSection) => s.type === 'coaches' || s.type === 'instructors');
+  console.log(coaches);
   const resources = validSections.find((s: ContentSection) => s.type === 'resources' || s.type === 'pdfs');
   const faq = validSections.find((s: ContentSection) => s.type === 'faq');
 
@@ -339,22 +341,31 @@ export const Home: React.FC = () => {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {videos.items.map((video: any, idx: number) => (
                 <div key={idx} className="bg-white border border-slate-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
-                  {video.thumbnail && (
-                    <div className="relative h-40 md:h-48 bg-slate-100">
-                      <img src={video.thumbnail} alt={video.title || video.Title} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-12 h-12 md:w-16 md:h-16 bg-red-600 rounded-full flex items-center justify-center text-white opacity-90 hover:opacity-100 transition-opacity">
+                  {(video.thumbnail || video.Thumbnail) && (
+                    <a
+                      href={video.url || video.Url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block relative h-40 md:h-48 bg-slate-100 group"
+                    >
+                      <img
+                        src={getImageUrl(video.thumbnail || video.Thumbnail)}
+                        alt={video.title || video.Title}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/20 transition-colors">
+                        <div className="w-12 h-12 md:w-16 md:h-16 bg-red-600 rounded-full flex items-center justify-center text-white opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all shadow-lg">
                           <svg className="w-6 h-6 md:w-8 md:h-8 ml-1" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
                           </svg>
                         </div>
                       </div>
-                    </div>
+                    </a>
                   )}
                   <div className="p-4 md:p-6">
                     <h3 className="text-lg md:text-xl font-semibold text-slate-900 mb-2" dangerouslySetInnerHTML={{ __html: video.title || video.Title || '' }} />
                     <p className="text-sm md:text-base text-slate-600 mb-4 line-clamp-2" dangerouslySetInnerHTML={{ __html: video.description || video.Description || '' }} />
-                    {video.url && (
+                    {(video.url || video.Url) && (
                       <a href={video.url || video.Url} target="_blank" rel="noopener noreferrer" className="text-red-600 hover:text-red-700 font-medium text-sm md:text-base inline-flex items-center gap-1">
                         Watch Video →
                       </a>
@@ -380,9 +391,13 @@ export const Home: React.FC = () => {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {coaches.items.map((coach: any, idx: number) => (
                 <div key={idx} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                  {coach.image && (
+                  {(coach.image || coach.Image) && (
                     <div className="h-48 md:h-64 overflow-hidden bg-slate-100">
-                      <img src={coach.image.startsWith('/') ? `${API_BASE}${coach.image}` : coach.image} alt={coach.name || coach.Name} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
+                      <img
+                        src={(coach.image || coach.Image).startsWith('/') ? `${API_BASE}${coach.image || coach.Image}` : (coach.image || coach.Image)}
+                        alt={coach.name || coach.Name}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      />
                     </div>
                   )}
                   <div className="p-4 md:p-6">
@@ -535,10 +550,41 @@ export const Home: React.FC = () => {
           <div className="container mx-auto px-8">
             {testimonials.title && (
               <>
-                <h2 className="text-3xl font-light text-slate-900 text-center mb-12">
-                  {testimonials.title}
-                </h2>
+                <h2 className="text-3xl font-light text-slate-900 text-center mb-12" dangerouslySetInnerHTML={{ __html: testimonials.title }} />
               </>
+            )}
+
+            {testimonials.items && testimonials.items.length > 0 && (
+              <div className="grid md:grid-cols-2 gap-8 mb-12">
+                {testimonials.items.map((item: any, idx: number) => {
+                  const imgSrc = item.image || item.Image;
+                  return (
+                    <div key={idx} className="bg-white p-6 rounded-lg shadow-sm border border-slate-100">
+                      <div className="flex gap-4 items-start">
+                        {imgSrc && (
+                          <div className="flex-shrink-0 w-16 h-16 rounded-full overflow-hidden bg-slate-100">
+                            <img
+                              src={imgSrc.startsWith('/') ? `${API_BASE}${imgSrc}` : imgSrc}
+                              alt={item.author || item.Author}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                        <div>
+                          <div className="text-slate-700 italic mb-3 text-sm" dangerouslySetInnerHTML={{ __html: item.quote || item.Quote || '' }} />
+                          <div className="font-semibold text-slate-900" dangerouslySetInnerHTML={{ __html: item.author || item.Author || '' }} />
+                          <div className="text-sm text-slate-500">
+                            <span dangerouslySetInnerHTML={{ __html: item.role || item.Role || '' }} />
+                            {(item.company || item.Company) && (
+                              <> • <span dangerouslySetInnerHTML={{ __html: item.company || item.Company || '' }} /></>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             )}
 
             {testimonials.logos && testimonials.logos.length > 0 && (

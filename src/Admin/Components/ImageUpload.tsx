@@ -49,7 +49,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch(`${API_BASE}/api/media/upload`, {
+      const response = await fetch(`${API_BASE}/api/FileUpload/image`, {
         method: 'POST',
         body: formData
       });
@@ -60,10 +60,10 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       }
 
       const data = await response.json();
-      
-      setPreviewUrl(data.url);
-      onImageChange(data.url);
-      
+
+      setPreviewUrl(data.fileUrl);
+      onImageChange(data.fileUrl);
+
       toast.success('✅ Image uploaded!');
     } catch (err: any) {
       console.error('Upload error:', err);
@@ -77,16 +77,16 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   return (
     <div className="relative group">
       <label className="block text-sm font-semibold text-slate-700 mb-2">{label}</label>
-      
+
       {/* Image Preview */}
-      <div 
+      <div
         className="relative bg-slate-100 rounded-xl overflow-hidden border-2 border-slate-200 hover:border-indigo-400 transition-all cursor-pointer"
         style={{ aspectRatio }}
         onClick={() => fileInputRef.current?.click()}
       >
         {previewUrl ? (
-          <img 
-            src={previewUrl.startsWith('/') ? `${API_BASE}${previewUrl}` : previewUrl} 
+          <img
+            src={previewUrl.startsWith('/') ? `${API_BASE}${previewUrl}` : previewUrl}
             alt={label}
             className="w-full h-full object-cover"
           />
