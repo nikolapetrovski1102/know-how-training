@@ -1,19 +1,21 @@
+
+import React, { Suspense, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from 'react-hot-toast';
 import { Layout } from './components/layout/Layout';
-import { Home } from './pages/Home';
 import { LanguageProvider } from './contexts/LanguageContext';
 import LogoImage from '../public/know-how-logo.png';
 import { ChevronLeft } from 'lucide-react';
-
-// ADMIN PAGES
-import { AdminPagesList } from './Admin/pages/AdminPagesList';
-import { EditHome } from './Admin/Pages/EditHome';
-import { useState } from 'react';
 import { EditorProvider, useEditor } from './contexts/EditorContext';
 import { AdminSidebar } from './Admin/Components/AdminSidebar';
+
+// Lazy Loaded Pages
+const Home = React.lazy(() => import('./Pages/Home').then(module => ({ default: module.Home })));
+const DynamicPage = React.lazy(() => import('./Pages/DynamicPage').then(module => ({ default: module.DynamicPage })));
+const AdminPagesList = React.lazy(() => import('./Admin/pages/AdminPagesList').then(module => ({ default: module.AdminPagesList })));
+const EditPage = React.lazy(() => import('./Admin/Pages/EditPage').then(module => ({ default: module.EditPage })));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -93,23 +95,19 @@ const AdminLoginPage: React.FC = () => {
 const AdminLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isSidebarOpen } = useEditor(); // Now works because EditorProvider wraps this component
+  const { isSidebarOpen } = useEditor();
 
   const canGoBack = location.pathname !== '/admin/pages';
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
-
-      {/* Main Content - Adjusts based on sidebar width */}
       <div
         className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ease-in-out ${isSidebarOpen ? 'mr-80' : 'mr-16'
           }`}
       >
-        {/* Top Bar with Back Button */}
         <header className="bg-white shadow-sm border-b border-slate-200 px-6 py-4 sticky top-0 z-40">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-4">
-              {/* Back Button */}
               {canGoBack && (
                 <button
                   onClick={() => navigate(-1)}
@@ -118,7 +116,6 @@ const AdminLayout: React.FC = () => {
                   <ChevronLeft className="w-5 h-5" />
                 </button>
               )}
-
               <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
             </div>
 
@@ -137,13 +134,10 @@ const AdminLayout: React.FC = () => {
           </div>
         </header>
 
-        {/* Page Content */}
         <main className="flex-1 p-8 overflow-auto bg-slate-50">
           <Outlet />
         </main>
       </div>
-
-      {/* Right Sidebar */}
       <AdminSidebar />
     </div>
   );
@@ -155,29 +149,36 @@ function App() {
       <LanguageProvider>
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<Layout><Home /></Layout>} />
+            <Suspense fallback={
+              <div className="flex items-center justify-center min-h-screen bg-white">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
+              </div>
+            }>
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/" element={<Layout><Home /></Layout>} />
+                <Route path="/:slug" element={<Layout><DynamicPage /></Layout>} />
 
-              {/* Admin Login */}
-              <Route path="/admin/login" element={<AdminLoginPage />} />
+                {/* Admin Login */}
+                <Route path="/admin/login" element={<AdminLoginPage />} />
 
-              {/* Protected Admin Routes with Layout */}
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute>
-                    <EditorProvider>
-                      <AdminLayout />
-                    </EditorProvider>
-                  </ProtectedRoute>
-                }
-              >
-                <Route index element={<Navigate to="pages" replace />} />
-                <Route path="pages" element={<AdminPagesList />} />
-                <Route path="pages/:id/edit" element={<EditHome />} />
-              </Route>
-            </Routes>
+                {/* Protected Admin Routes with Layout */}
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedRoute>
+                      <EditorProvider>
+                        <AdminLayout />
+                      </EditorProvider>
+                    </ProtectedRoute>
+                  }
+                >
+                  <Route index element={<Navigate to="pages" replace />} />
+                  <Route path="pages" element={<AdminPagesList />} />
+                  <Route path="pages/:id/edit" element={<EditPage />} />
+                </Route>
+              </Routes>
+            </Suspense>
             <Toaster position="top-right" />
           </BrowserRouter>
         </QueryClientProvider>
