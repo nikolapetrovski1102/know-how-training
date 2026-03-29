@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { FileText, Upload, X } from 'lucide-react';
+import { apiFetch } from '../../Utils/fetchWrapper';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://localhost:7062';
 
@@ -30,7 +31,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
             const formData = new FormData();
             formData.append('file', file);
 
-            const response = await fetch(`${API_BASE}/api/FileUpload/document`, {
+            const response = await apiFetch(`${API_BASE}/api/FileUpload/document`, {
                 method: 'POST',
                 body: formData
             });

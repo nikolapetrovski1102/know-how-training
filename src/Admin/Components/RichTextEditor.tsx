@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, useId } from 'react';
 import toast from 'react-hot-toast';
-import { useEditor } from '../../contexts/EditorContext';
+import { useEditor } from '../../Contexts/EditorContext';
 
 interface RichTextEditorProps {
   value: string;
@@ -358,8 +358,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             ${className} 
             outline-none 
             cursor-text
-            border border-transparent
-            hover:border-slate-300
+            border border-dashed
+            border-slate-300
+            hover:border-slate-500
+            hover:border-solid
             transition-all
             ${!value && placeholder ? 'before:content-[attr(data-placeholder)] before:text-slate-400' : ''}
         `}

@@ -21,25 +21,30 @@ interface FeaturedProgramsProps {
     title?: string;
     subtitle?: string;
     programs?: ProgramSummary[];
+    columns?: number;
+    alignment?: 'left' | 'center' | 'right';
 }
 
-export const FeaturedPrograms: React.FC<FeaturedProgramsProps> = ({ title, subtitle, programs }) => {
+export const FeaturedPrograms: React.FC<FeaturedProgramsProps> = ({ title, subtitle, programs, columns = 3, alignment = 'center' }) => {
     if (!programs || programs.length === 0) return null;
+
+    const gridCols = columns === 2 ? 'lg:grid-cols-2' : columns === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3';
+    const textAlign = alignment === 'left' ? 'text-left' : alignment === 'right' ? 'text-right' : 'text-center';
 
     return (
         <section className="py-24 bg-white">
             <div className="container mx-auto px-8">
                 {title && (
-                    <h2 className="text-3xl font-light text-slate-900 text-center mb-4">
+                    <h2 className={`text-3xl font-light text-slate-900 mb-4 ${textAlign}`}>
                         <span dangerouslySetInnerHTML={{ __html: title }} />
                     </h2>
                 )}
 
                 {subtitle && (
-                    <p className="text-slate-600 text-center mb-12 max-w-2xl mx-auto" dangerouslySetInnerHTML={{ __html: subtitle }} />
+                    <p className={`text-slate-600 mb-12 max-w-2xl px-4 ${alignment === 'center' ? 'mx-auto' : alignment === 'right' ? 'ml-auto' : 'mr-auto'} ${textAlign}`} dangerouslySetInnerHTML={{ __html: subtitle }} />
                 )}
 
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className={`grid md:grid-cols-2 ${gridCols} gap-8`}>
                     {programs.slice(0, 6).map(program => (
                         <Link
                             key={program.id}

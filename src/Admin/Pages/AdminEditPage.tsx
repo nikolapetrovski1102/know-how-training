@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import toast from 'react-hot-toast';
+import { apiFetch } from '../../Utils/fetchWrapper';
 
 interface EditableChange {
   path: string;
@@ -34,7 +35,7 @@ export const AdminEditPage: React.FC = () => {
 
   // Load page data
   useEffect(() => {
-    fetch(`/api/admin/pages/${slug}?lang=mk`)
+    apiFetch(`/api/admin/pages/${slug}?lang=mk`)
       .then(res => res.json())
       .then(setData)
       .catch(() => toast.error('Failed to load page'));
@@ -57,7 +58,7 @@ export const AdminEditPage: React.FC = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await fetch(`/api/admin/pages/${slug}`, {
+      await apiFetch(`/api/admin/pages/${slug}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ changes })
@@ -65,7 +66,7 @@ export const AdminEditPage: React.FC = () => {
       toast.success('✅ Page saved successfully!');
       setChanges([]);
       // Reload data
-      const res = await fetch(`/api/admin/pages/${slug}?lang=mk`);
+      const res = await apiFetch(`/api/admin/pages/${slug}?lang=mk`);
       setData(await res.json());
     } catch {
       toast.error('❌ Failed to save');
@@ -138,7 +139,7 @@ export const AdminEditPage: React.FC = () => {
                   <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 rotate-45 w-3 h-3 bg-slate-900 border-r border-b border-slate-700"></div>
                 </div>
               )}
-              
+
               <h1
                 data-editable
                 data-path="hero.title"
@@ -176,7 +177,7 @@ export const AdminEditPage: React.FC = () => {
                     <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 rotate-45 w-3 h-3 bg-slate-900 border-r border-b border-slate-700"></div>
                   </div>
                 )}
-                
+
                 <p
                   data-editable
                   data-path="hero.subtitle"
@@ -228,7 +229,7 @@ export const AdminEditPage: React.FC = () => {
                     ✏️ Double-click to edit
                   </div>
                 )}
-                
+
                 <h2
                   data-editable
                   data-path={`section.${idx}.title`}

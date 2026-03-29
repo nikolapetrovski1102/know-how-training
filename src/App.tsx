@@ -4,17 +4,17 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from 'react-hot-toast';
-import { Layout } from './components/layout/Layout';
-import { LanguageProvider } from './contexts/LanguageContext';
+import { Layout } from './Components/Layout/Layout';
+import { LanguageProvider } from './Contexts/LanguageContext';
 import LogoImage from '../public/know-how-logo.png';
 import { ChevronLeft } from 'lucide-react';
-import { EditorProvider, useEditor } from './contexts/EditorContext';
+import { EditorProvider, useEditor } from './Contexts/EditorContext';
 import { AdminSidebar } from './Admin/Components/AdminSidebar';
 
 // Lazy Loaded Pages
 const Home = React.lazy(() => import('./Pages/Home').then(module => ({ default: module.Home })));
 const DynamicPage = React.lazy(() => import('./Pages/DynamicPage').then(module => ({ default: module.DynamicPage })));
-const AdminPagesList = React.lazy(() => import('./Admin/pages/AdminPagesList').then(module => ({ default: module.AdminPagesList })));
+const AdminPagesList = React.lazy(() => import('./Admin/Pages/AdminPagesList').then(module => ({ default: module.AdminPagesList })));
 const EditPage = React.lazy(() => import('./Admin/Pages/EditPage').then(module => ({ default: module.EditPage })));
 
 const queryClient = new QueryClient({
@@ -156,7 +156,7 @@ function App() {
             }>
               <Routes>
                 {/* Public Routes */}
-                <Route path="/" element={<Layout><Home /></Layout>} />
+                <Route path="/" element={<Navigate to="/home" replace />} />
                 <Route path="/:slug" element={<Layout><DynamicPage /></Layout>} />
 
                 {/* Admin Login */}

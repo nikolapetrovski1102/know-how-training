@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import toast from 'react-hot-toast';
+import { apiFetch } from '../../Utils/fetchWrapper';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://localhost:7062';
 
@@ -49,7 +50,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch(`${API_BASE}/api/FileUpload/image`, {
+      const response = await apiFetch(`${API_BASE}/api/FileUpload/image`, {
         method: 'POST',
         body: formData
       });

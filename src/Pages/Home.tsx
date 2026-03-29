@@ -3,9 +3,10 @@ import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import type { ContentSection, PageData } from '../Types/page';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useLanguage } from '../Contexts/LanguageContext';
 import { PageContentRenderer } from '../Components/PageContentRenderer';
 import { IntroCard } from '../Components/Sections/IntroCard';
+import { apiFetch } from '../Utils/fetchWrapper';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://localhost:7062';
 
@@ -15,7 +16,7 @@ export const Home: React.FC = () => {
   const { currentLanguage } = useLanguage();
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/pages/home?lang=${currentLanguage}`)
+    apiFetch(`${API_BASE}/api/pages/home?lang=${currentLanguage}`)
       .then(res => res.json())
       .then(apiResponse => {
         const sectionsJson = apiResponse.contentSections || apiResponse.contentSectionsJson;

@@ -16,21 +16,26 @@ interface ResourcesProps {
     title?: string;
     subtitle?: string;
     items?: ResourceItem[];
+    columns?: number;
+    alignment?: 'left' | 'center' | 'right';
 }
 
-export const Resources: React.FC<ResourcesProps> = ({ title, subtitle, items }) => {
+export const Resources: React.FC<ResourcesProps> = ({ title, subtitle, items, columns = 3, alignment = 'left' }) => {
     if (!items || items.length === 0) return null;
+
+    const gridCols = columns === 2 ? 'lg:grid-cols-2' : columns === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3';
+    const textAlign = alignment === 'center' ? 'text-center' : alignment === 'right' ? 'text-right' : 'text-left';
 
     return (
         <section className="py-16 md:py-24 bg-white">
             <div className="container mx-auto px-4 md:px-8">
                 {title && (
-                    <h2 className="text-3xl md:text-4xl font-light text-slate-900 text-center mb-3 md:mb-4" dangerouslySetInnerHTML={{ __html: title }} />
+                    <h2 className={`text-3xl md:text-4xl font-light text-slate-900 mb-3 md:mb-4 ${textAlign}`} dangerouslySetInnerHTML={{ __html: title }} />
                 )}
                 {subtitle && (
-                    <p className="text-slate-600 text-center mb-8 md:mb-12 max-w-2xl mx-auto px-4" dangerouslySetInnerHTML={{ __html: subtitle }} />
+                    <p className={`text-slate-600 mb-8 md:mb-12 max-w-2xl px-4 ${alignment === 'center' ? 'mx-auto' : alignment === 'right' ? 'ml-auto' : 'mr-auto'} ${textAlign}`} dangerouslySetInnerHTML={{ __html: subtitle }} />
                 )}
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                <div className={`grid sm:grid-cols-2 ${gridCols} gap-4 md:gap-6`}>
                     {items.map((resource, idx) => (
                         <a
                             key={idx}
@@ -42,7 +47,7 @@ export const Resources: React.FC<ResourcesProps> = ({ title, subtitle, items }) 
                             <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 bg-red-600 rounded-lg flex items-center justify-center text-white font-bold text-xs md:text-sm">
                                 {(resource.fileType || resource.FileType || 'PDF').substring(0, 3)}
                             </div>
-                            <div className="flex-1 min-w-0">
+                            <div className={`flex-1 min-w-0 ${textAlign}`}>
                                 <h3 className="font-semibold text-slate-900 mb-1 text-sm md:text-base" dangerouslySetInnerHTML={{ __html: resource.title || resource.Title || '' }} />
                                 <p className="text-xs md:text-sm text-slate-600 line-clamp-2" dangerouslySetInnerHTML={{ __html: resource.description || resource.Description || '' }} />
                             </div>

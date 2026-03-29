@@ -30,6 +30,7 @@ export interface Hero {
 
 export interface ContentSection {
   type: string;
+  styleId?: number;
   title?: string;
   subtitle?: string;
   description?: string;
@@ -65,26 +66,26 @@ export interface PageData {
   slug: string;
   isPublished: boolean;
   languageCode: string;
-  
+
   // SEO
   seoTitle: string;
   seoDescription?: string;
-  
+
   // Hero
   heroTitle?: string;
   heroSubtitle?: string;
   heroCtaText?: string;
   heroCtaUrl?: string;
   heroImage?: string;
-  
+
   // Content
   contentSectionsJson?: string;
-  
+
   // OpenGraph
   openGraphTitle?: string;
   openGraphDescription?: string;
   openGraphImage?: string;
-  
+
   // Programs
   programs?: Program[];
 }

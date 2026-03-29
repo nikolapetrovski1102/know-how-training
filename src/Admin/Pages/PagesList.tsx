@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { apiFetch } from '../../Utils/fetchWrapper';
 
 interface PageSummary {
   id: number;
@@ -12,10 +13,9 @@ interface PageSummary {
 export const PagesList: React.FC = () => {
   const [pages, setPages] = useState<PageSummary[]>([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('/api/admin/pages')
+    apiFetch('/api/admin/pages')
       .then(res => res.json())
       .then((data: PageSummary[]) => {
         setPages(data);
@@ -79,11 +79,10 @@ export const PagesList: React.FC = () => {
                     </td>
                     <td className="px-6 py-5">
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          page.isPublished
-                            ? 'bg-emerald-100 text-emerald-800'
-                            : 'bg-amber-100 text-amber-800'
-                        }`}
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${page.isPublished
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : 'bg-amber-100 text-amber-800'
+                          }`}
                       >
                         {page.isPublished ? '✅ Live' : '⏳ Draft'}
                       </span>

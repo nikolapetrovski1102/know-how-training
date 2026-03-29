@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
-import { useEditor } from '../../contexts/EditorContext';
-import { LayoutDashboard, Image, Users, Menu, ChevronRight, ChevronLeft, Type, MousePointer2 } from 'lucide-react';
+import React from 'react';
+import { useEditor } from '../../Contexts/EditorContext';
+import { LayoutDashboard, Image, Users, ChevronRight, ChevronLeft, Type, MousePointer2 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 export const AdminSidebar: React.FC = () => {
     const { activeTab, setActiveTab, executeFormat, activeEditorId, isSidebarOpen, toggleSidebar } = useEditor();

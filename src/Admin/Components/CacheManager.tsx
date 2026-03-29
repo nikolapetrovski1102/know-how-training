@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { apiFetch } from '../../Utils/fetchWrapper';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://localhost:7062';
 
@@ -8,10 +9,10 @@ export const CacheManager: React.FC = () => {
 
   const clearAllCache = async () => {
     if (!confirm('Clear ALL cache? This will affect all pages and languages.')) return;
-    
+
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE}/api/admin/cache/clear`, {
+      const response = await apiFetch(`${API_BASE}/api/admin/cache/clear`, {
         method: 'DELETE'
       });
       const data = await response.json();
@@ -28,7 +29,7 @@ export const CacheManager: React.FC = () => {
   const clearPageCache = async (slug: string) => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE}/api/admin/cache/page/${slug}`, {
+      const response = await apiFetch(`${API_BASE}/api/admin/cache/page/${slug}`, {
         method: 'DELETE'
       });
       const data = await response.json();
@@ -46,7 +47,7 @@ export const CacheManager: React.FC = () => {
     setLoading(true);
     toast.loading('🔥 Warming cache...');
     try {
-      const response = await fetch(`${API_BASE}/api/admin/cache/warm`, {
+      const response = await apiFetch(`${API_BASE}/api/admin/cache/warm`, {
         method: 'POST'
       });
       const data = await response.json();

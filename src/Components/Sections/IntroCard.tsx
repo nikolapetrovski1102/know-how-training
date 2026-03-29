@@ -27,7 +27,7 @@ export const IntroCard: React.FC<IntroCardProps> = (props) => {
             <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-slate-100 animate-fade-in-up animation-delay-600">
                 {/* Greeting */}
                 {greeting && (
-                    <h3
+                    <h3 
                         className="text-2xl md:text-3xl font-light text-slate-900 mb-4"
                         dangerouslySetInnerHTML={{ __html: greeting }}
                     />
@@ -35,7 +35,7 @@ export const IntroCard: React.FC<IntroCardProps> = (props) => {
 
                 {/* Name */}
                 {name && (
-                    <p
+                    <p 
                         className="text-lg font-semibold text-slate-900 mb-2"
                         dangerouslySetInnerHTML={{ __html: name }}
                     />
@@ -43,7 +43,7 @@ export const IntroCard: React.FC<IntroCardProps> = (props) => {
 
                 {/* Title/Role */}
                 {title && (
-                    <p
+                    <p 
                         className="text-sm text-slate-600 mb-4 italic"
                         dangerouslySetInnerHTML={{ __html: title }}
                     />
@@ -51,7 +51,7 @@ export const IntroCard: React.FC<IntroCardProps> = (props) => {
 
                 {/* Description */}
                 {description && (
-                    <p
+                    <p 
                         className="text-slate-600 leading-relaxed"
                         dangerouslySetInnerHTML={{ __html: description }}
                     />

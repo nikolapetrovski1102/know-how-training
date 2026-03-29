@@ -1,4 +1,3 @@
-// Components/VideoEmbed.tsx
 import React from 'react';
 
 interface VideoEmbedProps {

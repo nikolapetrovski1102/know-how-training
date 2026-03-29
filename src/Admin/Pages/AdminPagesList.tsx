@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { apiFetch } from '../../Utils/fetchWrapper';
 
 interface PageSummary {
   id: number;
@@ -19,7 +20,7 @@ export const AdminPagesList: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/admin/pages`)
+    apiFetch(`${API_BASE}/api/admin/pages`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch pages');
         return res.json();
@@ -38,7 +39,7 @@ export const AdminPagesList: React.FC = () => {
     const toastId = toast.loading('Clearing cache...');
 
     try {
-      const response = await fetch(`${API_BASE}/api/admin/cache/clear`, {
+      const response = await apiFetch(`${API_BASE}/api/admin/cache/clear`, {
         method: 'DELETE'
       });
 
@@ -59,7 +60,7 @@ export const AdminPagesList: React.FC = () => {
     const toastId = toast.loading(`Clearing cache for ${slug}...`);
 
     try {
-      const response = await fetch(`${API_BASE}/api/admin/cache/page/${slug}`, {
+      const response = await apiFetch(`${API_BASE}/api/admin/cache/page/${slug}`, {
         method: 'DELETE'
       });
 
@@ -80,7 +81,7 @@ export const AdminPagesList: React.FC = () => {
     const toastId = toast.loading('Clearing navigation cache...');
 
     try {
-      const response = await fetch(`${API_BASE}/api/admin/cache/navigation`, {
+      const response = await apiFetch(`${API_BASE}/api/admin/cache/navigation`, {
         method: 'DELETE'
       });
 
@@ -101,7 +102,7 @@ export const AdminPagesList: React.FC = () => {
     const toastId = toast.loading('Warming cache...');
 
     try {
-      const response = await fetch(`${API_BASE}/api/admin/cache/warm`, {
+      const response = await apiFetch(`${API_BASE}/api/admin/cache/warm`, {
         method: 'POST'
       });
 
@@ -149,7 +150,7 @@ export const AdminPagesList: React.FC = () => {
       {/* Cache Management */}
       <div className="bg-white border border-slate-200 rounded-lg p-6 mb-6">
         <h2 className="text-lg font-semibold text-slate-900 mb-4">Cache Management</h2>
-        
+
         <div className="flex flex-wrap gap-3">
           <button
             onClick={handleClearAllCache}
@@ -215,11 +216,10 @@ export const AdminPagesList: React.FC = () => {
                   <div className="text-xs text-slate-500">ID: {page.id}</div>
                 </td>
                 <td className="px-6 py-4">
-                  <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
-                    page.isPublished 
-                      ? 'bg-green-100 text-green-800' 
+                  <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${page.isPublished
+                      ? 'bg-green-100 text-green-800'
                       : 'bg-amber-100 text-amber-800'
-                  }`}>
+                    }`}>
                     {page.isPublished ? 'Published' : 'Draft'}
                   </span>
                 </td>

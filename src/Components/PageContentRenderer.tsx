@@ -10,6 +10,8 @@ import { Testimonials } from './Sections/Testimonials';
 import { FeaturedPrograms } from './Sections/FeaturedPrograms';
 import { FeatureGridSectionComponent } from './Sections/FeatureGridSection';
 import { IntroTextSectionComponent } from './Sections/IntroTextSection';
+import { HeroBanner } from './Sections/HeroBanner';
+import { Collaborators } from './Sections/Collaborators';
 
 interface PageContentRendererProps {
     sections: ContentSection[];
@@ -25,56 +27,77 @@ export const PageContentRenderer: React.FC<PageContentRendererProps> = ({ sectio
     return (
         <>
             {validSections.map((section, idx) => {
-                const type = section.type.toLowerCase();
+                const type = (section.type || section.Type || '').toLowerCase();
+
+                // Normalize props for grid-based sections
+                const columns = Math.max(1, section.columns || section.Columns || 3);
+                const alignment = (section.alignment || section.Alignment || 'left') as 'left' | 'center' | 'right';
+
+                const commonProps = {
+                    key: idx,
+                    ...section,
+                    items: section.items || section.Items || [],
+                    columns,
+                    alignment,
+                    styleId: section.styleId || section.StyleId || 0
+                };
+
+                const { key: sectionKey, ...restProps } = commonProps;
 
                 switch (type) {
                     case 'intro-card':
-                        // IntroCard needs to be positioned absolutely relative to Hero.
-                        // But here we are rendering it in the flow.
-                        // In Home.tsx, it's inside the Hero section.
-                        // DynamicPage structure might differ.
-                        // For generic pages, we probably want it as a standard section OR we handle Hero + IntroCard separately.
-                        // Let's assume for now it renders as a block if not in Hero.
-                        // Or we can just render it. 
-                        return <IntroCard key={idx} {...section} />;
+                        return <IntroCard key={idx} {...restProps} />;
                     case 'stats':
-                        return <Stats key={idx} {...section} />;
+                        return <Stats key={idx} {...restProps} />;
                     case 'videos':
-                        return <Videos key={idx} {...section} />;
+                        return <Videos key={idx} {...restProps} />;
                     case 'coaches':
                     case 'instructors':
                     case 'trainers':
-                        return <Coaches key={idx} {...section} />;
+                        return <Coaches key={idx} {...restProps} />;
                     case 'resources':
                     case 'pdfs':
                     case 'downloads':
-                        return <Resources key={idx} {...section} />;
+                        return <Resources key={idx} {...restProps} />;
                     case 'faq':
-                        return <Faq key={idx} {...section} />;
+                        return <Faq key={idx} {...restProps} />;
                     case 'testimonials':
-                        return <Testimonials key={idx} {...section} />;
+                        return <Testimonials key={idx} {...restProps} />;
                     case 'featured-programs':
-                        return <FeaturedPrograms key={idx} {...section} programs={programs} />;
-
+                        return <FeaturedPrograms key={idx} {...restProps} programs={programs} />;
                     case 'feature-grid':
                         return <FeatureGridSectionComponent key={idx} data={{
-                            title: section.title || '',
-                            subtitle: section.subtitle,
-                            // Map generic items to features if extracted from generic list
-                            features: (section.items || []).map((item: any) => ({
+                            title: section.title || section.Title || '',
+                            subtitle: section.subtitle || section.Subtitle,
+                            features: (section.items || section.Items || []).map((item: any) => ({
                                 icon: item.icon || item.Icon || '⭐',
                                 title: item.title || item.Title || '',
                                 description: item.description || item.Description || ''
                             })),
-                            columns: section.columns || 3
+                            columns: (columns === 2 || columns === 3 || columns === 4 ? columns : 3) as 2 | 3 | 4
                         }} />;
 
                     case 'intro-text':
                         return <IntroTextSectionComponent key={idx} data={{
-                            headline: section.title || '',
-                            body: section.description || '',
-                            alignment: (section.alignment as any) || 'center'
+                            headline: section.title || section.Title || '',
+                            body: section.description || section.Description || '',
+                            alignment: alignment
                         }} />;
+
+                    case 'hero-banner':
+                        return <HeroBanner key={idx}
+                            Title={section.title || section.Title || ''}
+                            Subtitle={section.subtitle || section.Subtitle}
+                            ImageUrl={section.ImageUrl || section.imageUrl || section.heroImage || ''}
+                            CtaText={section.ctaText || section.CtaText}
+                            CtaUrl={section.ctaUrl || section.CtaUrl}
+                            alignment={alignment}
+                        />;
+
+                    case 'collaborators':
+                    case 'partners':
+                    case 'logos':
+                        return <Collaborators key={idx} {...restProps} />;
 
                     default:
                         return null;

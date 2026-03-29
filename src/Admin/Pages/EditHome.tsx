@@ -2,9 +2,10 @@ import { useEffect, useState, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { apiFetch } from '../../Utils/fetchWrapper';
 import { ImageUpload } from '../Components/ImageUpload';
 import { RichTextEditor } from '../Components/RichTextEditor';
-import { useEditor } from '../../contexts/EditorContext';
+import { useEditor } from '../../Contexts/EditorContext';
 import { FileUpload } from '../Components/FileUpload';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://localhost:7062';
@@ -103,7 +104,7 @@ export const EditHome: React.FC = () => {
   const [faqItems, setFaqItems] = useState<Array<{ question: string; answer: string }>>([]);
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/languages`)
+    apiFetch(`${API_BASE}/api/languages`)
       .then(res => res.json())
       .then(langs => {
         const mappedLangs = langs.map((l: any) => ({
@@ -135,9 +136,9 @@ export const EditHome: React.FC = () => {
     const url = `${API_BASE}/api/pages/home?lang=${selectedLanguage}`;
 
     setLoading(true);
-    fetch(url)
+    apiFetch(url)
       .then(res => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status} `);
         return res.json();
       })
       .then(apiResponse => {
@@ -223,7 +224,7 @@ export const EditHome: React.FC = () => {
       })
       .catch(err => {
         console.error('Failed to load page:', err);
-        toast.error(`Failed to load page: ${err.message}`);
+        toast.error(`Failed to load page: ${err.message} `);
         setLoading(false);
       });
   }, [id, selectedLanguage]);
@@ -421,7 +422,7 @@ export const EditHome: React.FC = () => {
   const handleLanguageChange = (langCode: string) => {
     if (edits.length > 0) {
       const confirm = window.confirm(
-        `You have ${edits.length} unsaved changes. Switching language will discard them. Continue?`
+        `You have ${edits.length} unsaved changes.Switching language will discard them.Continue ? `
       );
       if (!confirm) return;
     }
@@ -441,7 +442,7 @@ export const EditHome: React.FC = () => {
     try {
       const url = `${API_BASE}/api/admin/pages/${data.slug}`;
 
-      const response = await fetch(url, {
+      const response = await apiFetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -468,12 +469,12 @@ export const EditHome: React.FC = () => {
       setImageEdits({});
 
       // Reload data
-      const reloadRes = await fetch(`${API_BASE}/api/pages/home?lang=${selectedLanguage}`);
+      const reloadRes = await apiFetch(`${API_BASE}/api/pages/home?lang=${selectedLanguage}`);
       const reloadedData = await reloadRes.json();
       setData(reloadedData);
     } catch (err: any) {
       console.error('Save error:', err);
-      toast.error(`Failed: ${err.message}`);
+      toast.error(`Failed: ${err.message} `);
     }
   };
 
@@ -556,12 +557,12 @@ export const EditHome: React.FC = () => {
       </Helmet>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
         * {
           font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
-      `}</style>
+`}</style>
 
       {/* Sticky Save Bar */}
       {edits.length > 0 && (
@@ -657,7 +658,7 @@ export const EditHome: React.FC = () => {
             }}
           >
             <img
-              src={hero.image.startsWith('/') ? `${API_BASE}${hero.image}` : hero.image}
+              src={hero.image.startsWith('/') ? `${API_BASE}${hero.image} ` : hero.image}
               alt=""
               className="w-auto h-[100vh] object-contain opacity-20"
               style={{
@@ -818,7 +819,7 @@ export const EditHome: React.FC = () => {
                       <RichTextEditor
                         value={stat.value || stat.Value || '<span style="font-size: 48px;">0</span>'}
                         onChange={(value) => {
-                          console.log(`📝 Stat ${idx} value changed:`, value);
+                          console.log(`📝 Stat ${idx} value changed: `, value);
                           const newItems = [...statsItems];
                           newItems[idx] = {
                             ...newItems[idx],
@@ -849,7 +850,7 @@ export const EditHome: React.FC = () => {
                       <RichTextEditor
                         value={stat.label || stat.Label || 'Label'}
                         onChange={(value) => {
-                          console.log(`📝 Stat ${idx} label changed:`, value);
+                          console.log(`📝 Stat ${idx} label changed: `, value);
                           const newItems = [...statsItems];
                           newItems[idx] = {
                             ...newItems[idx],

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Globe, ChevronDown, Phone, Mail, Clock } from 'lucide-react';
-import { useLanguage } from '../../Contexts/LanguageContext';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { apiFetch } from '../../Utils/fetchWrapper';
 import LogoImage from '../../../public/know-how-logo.png';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://localhost:7062';
@@ -53,7 +54,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   }, []);
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/navigation?lang=${currentLanguage}`)
+    apiFetch(`${API_BASE}/api/navigation?lang=${currentLanguage}`)
       .then(res => res.json())
       .then(data => {
         setNavItems(data.items || data || []);
@@ -92,13 +93,13 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   return (
     <div className="min-h-screen bg-white">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
         * {
           font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
-        @keyframes slideDown {
+@keyframes slideDown {
           from {
             opacity: 0;
             transform: translateY(-20px);
@@ -107,16 +108,16 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             opacity: 1;
             transform: translateY(0);
           }
-        }
+}
 
-        @keyframes slideInRight {
+@keyframes slideInRight {
           from {
             transform: translateX(100%);
           }
           to {
             transform: translateX(0);
           }
-        }
+}
 
         .animate-slide-down-menu {
           animation: slideDown 0.3s ease-out;
@@ -129,29 +130,26 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         .header-transition {
           transition: all 0.4s ease-in-out;
         }
-      `}</style>
+`}</style>
 
       {/* Header - Fixed position, always sticks to top */}
-      <header className={`fixed top-0 left-0 right-0 z-50 header-transition ${
-        isScrolled ? 'shadow-lg' : 'shadow-none'
-      }`}>
+      <header className={`fixed top-0 left-0 right-0 z-50 header-transition ${isScrolled ? 'shadow-lg' : 'shadow-none'}`}>
         {/* Top Bar - Contact Info */}
-        <div className={`border-b header-transition bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-red-600
-        } text-white`}>
+        <div className={`border-b header-transition bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-12 text-sm">
               {/* Left - Contact Details */}
               <div className="hidden md:flex items-center gap-6">
-                <a 
-                  href="tel:+38970123456" 
+                <a
+                  href="tel:+38970123456"
                   className="flex items-center gap-2 hover:text-red-400 transition-colors group"
                 >
                   <Phone className="w-4 h-4 group-hover:scale-110 transition-transform" />
                   <span>+389 70 123 456</span>
                 </a>
                 <div className="w-px h-4 bg-slate-600"></div>
-                <a 
-                  href="mailto:info@knowhow-training.com" 
+                <a
+                  href="mailto:info@knowhow-training.com"
                   className="flex items-center gap-2 hover:text-red-400 transition-colors group"
                 >
                   <Mail className="w-4 h-4 group-hover:scale-110 transition-transform" />
@@ -176,13 +174,12 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
               {/* Right - Language Selector */}
               <div className="relative">
-                <button 
+                <button
                   onClick={() => setIsLangOpen(!isLangOpen)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded transition-colors ${
-                    isScrolled || !isHomePage
-                      ? 'bg-slate-700/50 hover:bg-slate-700'
-                      : 'bg-white/10 hover:bg-white/20'
-                  }`}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded transition-colors ${isScrolled || !isHomePage
+                    ? 'bg-slate-700/50 hover:bg-slate-700'
+                    : 'bg-white/10 hover:bg-white/20'
+                    }`}
                 >
                   <Globe className="w-4 h-4" />
                   <span className="text-xs font-medium">{currentLang.code.toUpperCase()}</span>
@@ -191,8 +188,8 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
                 {isLangOpen && (
                   <>
-                    <div 
-                      className="fixed inset-0 z-40" 
+                    <div
+                      className="fixed inset-0 z-40"
                       onClick={() => setIsLangOpen(false)}
                     />
                     <div className="absolute right-0 mt-2 w-44 bg-white rounded-lg border border-slate-200 shadow-xl py-1 z-50">
@@ -203,11 +200,10 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                             setLanguage(lang.code);
                             setIsLangOpen(false);
                           }}
-                          className={`w-full flex items-center justify-between px-4 py-2.5 text-left text-sm transition-colors ${
-                            currentLanguage === lang.code 
-                              ? 'bg-red-100 text-red-700 font-semibold' 
-                              : 'text-slate-700 bg-slate-50'
-                          }`}
+                          className={`w-full flex items-center justify-between px-4 py-2.5 text-left text-sm transition-colors ${currentLanguage === lang.code
+                            ? 'bg-red-100 text-red-700 font-semibold'
+                            : 'text-slate-700 bg-slate-50'
+                            }`}
                         >
                           <span>{lang.name}</span>
                           {currentLanguage === lang.code && (
@@ -224,31 +220,28 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         </div>
 
         {/* Main Navigation Bar */}
-        <nav className={`header-transition ${
-          isScrolled 
-            ? 'bg-white border-b border-slate-200' 
-            : isHomePage
-              ? 'bg-white/40 backdrop-blur-xl border-b border-white/20'
-              : 'bg-white border-b border-slate-200'
-        }`}>
+        <nav className={`header-transition ${isScrolled
+          ? 'bg-white border-b border-slate-200'
+          : isHomePage
+            ? 'bg-white/40 backdrop-blur-xl border-b border-white/20'
+            : 'bg-white border-b border-slate-200'
+          }`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between lg:justify-center h-20 relative">
               {/* Logo */}
               <Link to="/" className="flex items-center gap-3 group lg:absolute lg:left-4">
-                <img 
+                <img
                   src={LogoImage}
                   alt='know-how-logo'
                   className="h-12 w-auto transition-transform group-hover:scale-105"
                 />
                 <div className="hidden sm:block">
-                  <h1 className={`text-xl font-bold transition-colors ${
-                    isScrolled || !isHomePage ? 'text-slate-900' : 'text-slate-900'
-                  } group-hover:text-red-600`}>
+                  <h1 className={`text-xl font-bold transition-colors ${isScrolled || !isHomePage ? 'text-slate-900' : 'text-slate-900'
+                    } group-hover:text-red-600`}>
                     KnowHow Training
                   </h1>
-                  <p className={`text-xs font-medium tracking-wide ${
-                    isScrolled || !isHomePage ? 'text-slate-500' : 'text-slate-700'
-                  }`}>
+                  <p className={`text-xs font-medium tracking-wide ${isScrolled || !isHomePage ? 'text-slate-500' : 'text-slate-700'
+                    }`}>
                     Leadership Excellence
                   </p>
                 </div>
@@ -265,7 +258,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                   <span className="md:hidden">Contact</span>
                 </Link>
 
-                <button 
+                <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
                   className={`p-2.5 rounded-lg transition-colors border hover:border-red-600 bg-white`}
                   aria-label="Toggle menu"
@@ -284,12 +277,12 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
       {/* Menu Overlay - Only for mobile */}
       {isMenuOpen && (
-        <div 
-          className="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" 
-          onClick={() => setIsMenuOpen(false)} 
+        <div
+          className="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+          onClick={() => setIsMenuOpen(false)}
         />
       )}
-      
+
       {/* Mobile Menu - Side Drawer */}
       {isMenuOpen && (
         <div className="lg:hidden fixed top-0 right-0 z-50 h-full w-full sm:w-96 bg-white shadow-2xl animate-slide-in-right">
@@ -299,7 +292,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 <h2 className="text-lg font-bold">Navigation</h2>
                 <p className="text-xs text-slate-300 mt-0.5">Explore our services</p>
               </div>
-              <button 
+              <button
                 onClick={() => setIsMenuOpen(false)}
                 className="p-2 rounded-lg hover:bg-slate-700 transition-colors"
                 aria-label="Close menu"
@@ -307,7 +300,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 <X className="w-6 h-6" />
               </button>
             </div>
-            
+
             <nav className="flex-1 overflow-y-auto p-4 bg-slate-50">
               {loading ? (
                 <div className="flex items-center justify-center py-8">
@@ -319,11 +312,10 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                     <Link
                       key={item.slug}
                       to={item.slug === 'home' ? '/' : `/${item.slug}`}
-                      className={`group flex items-center gap-3 px-4 py-3.5 rounded-lg font-semibold text-sm transition-all ${
-                        isActive(item.slug)
-                          ? 'bg-slate-900 text-white shadow-lg scale-[1.02]'
-                          : 'text-slate-700 bg-white hover:bg-red-50 hover:text-red-600 hover:scale-[1.01] shadow-sm'
-                      }`}
+                      className={`group flex items-center gap-3 px-4 py-3.5 rounded-lg font-semibold text-sm transition-all ${isActive(item.slug)
+                        ? 'bg-slate-900 text-white shadow-lg scale-[1.02]'
+                        : 'text-slate-700 bg-white hover:bg-red-50 hover:text-red-600 hover:scale-[1.01] shadow-sm'
+                        }`}
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <span className={`text-xl font-light ${isActive(item.slug) ? 'text-red-400' : 'text-slate-400'}`}>
@@ -369,16 +361,14 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                       <Link
                         key={item.slug}
                         to={item.slug === 'home' ? '/' : `/${item.slug}`}
-                        className={`group flex items-center gap-4 px-6 py-5 rounded-xl font-semibold text-sm transition-all ${
-                          isActive(item.slug)
-                            ? 'bg-slate-900 text-white shadow-xl scale-105'
-                            : 'text-slate-700 bg-slate-50 hover:bg-red-50 hover:text-red-600 hover:shadow-lg hover:scale-105'
-                        }`}
+                        className={`group flex items-center gap-4 px-6 py-5 rounded-xl font-semibold text-sm transition-all ${isActive(item.slug)
+                          ? 'bg-slate-900 text-white shadow-xl scale-105'
+                          : 'text-slate-700 bg-slate-50 hover:bg-red-50 hover:text-red-600 hover:shadow-lg hover:scale-105'
+                          }`}
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        <span className={`text-3xl font-light ${
-                          isActive(item.slug) ? 'text-red-400' : 'text-slate-400 group-hover:text-red-500'
-                        }`}>
+                        <span className={`text-3xl font-light ${isActive(item.slug) ? 'text-red-400' : 'text-slate-400 group-hover:text-red-500'
+                          }`}>
                           {getEmoji(item.slug)}
                         </span>
                         <span className="flex-1">{item.title}</span>
@@ -401,7 +391,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       {/* Footer */}
       <footer className="mt-32 bg-slate-900 text-white relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-1 bg-red-600"></div>
-        
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-16 grid md:grid-cols-4 gap-12">
             <div className="col-span-2">

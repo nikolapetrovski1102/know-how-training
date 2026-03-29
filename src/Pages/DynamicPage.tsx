@@ -1,10 +1,10 @@
-
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link, useParams } from 'react-router-dom';
 import type { PageData, ContentSection } from '../Types/page';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useLanguage } from '../Contexts/LanguageContext';
 import { PageContentRenderer } from '../Components/PageContentRenderer';
+import { apiFetch } from '../Utils/fetchWrapper';
 import { IntroCard } from '../Components/Sections/IntroCard';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://localhost:7062';
@@ -16,22 +16,20 @@ export const DynamicPage: React.FC = () => {
     const { currentLanguage } = useLanguage();
 
     useEffect(() => {
+        console.log("slug", slug);
         if (!slug) return;
 
-        // Determine API endpoint. For 'home', we use specific endpoint, for others generic.
-        // Actually, Home is handled by Home.tsx, so this is for others.
         const endpoint = `${API_BASE}/api/pages/${slug}?lang=${currentLanguage}`;
 
         setLoading(true);
-        fetch(endpoint)
+        apiFetch(endpoint)
             .then(res => {
                 if (!res.ok) throw new Error('Page not found');
                 return res.json();
             })
             .then(apiResponse => {
-                // console.log('Page API Response:', apiResponse);
+                console.log('Page API Response:', apiResponse);
 
-                // Support both contentSections and contentSectionsJson
                 const sectionsJson = apiResponse.contentSections || apiResponse.contentSectionsJson;
 
                 const transformedData: PageData = {
@@ -40,18 +38,15 @@ export const DynamicPage: React.FC = () => {
                     isPublished: apiResponse.isPublished,
                     languageCode: apiResponse.languageCode,
 
-                    // SEO
                     seoTitle: apiResponse.seoTitle,
                     seoDescription: apiResponse.seoDescription,
 
-                    // Hero
                     heroTitle: apiResponse.heroTitle,
                     heroSubtitle: apiResponse.heroSubtitle,
                     heroCtaText: apiResponse.heroCtaText,
                     heroCtaUrl: apiResponse.heroCtaUrl,
                     heroImage: apiResponse.heroImage,
 
-                    // Content
                     contentSectionsJson: sectionsJson,
 
                     programs: apiResponse.programs || []
@@ -98,16 +93,13 @@ export const DynamicPage: React.FC = () => {
         if (Array.isArray(rawSections)) {
             sections = rawSections.map((s: any) => ({
                 type: (s.Type || s.type || '').toLowerCase(),
-                // Normalize common fields
                 title: s.Title || s.title,
                 subtitle: s.Subtitle || s.subtitle,
                 greeting: s.Greeting || s.greeting,
                 name: s.Name || s.name,
                 description: s.Description || s.description,
-                // Lists
                 items: s.Items || s.items,
                 logos: s.Logos || s.logos,
-                // Pass through others if needed specific to section types
                 ...s
             })).filter((s: ContentSection) => s.type && s.type.trim() !== '');
         }
@@ -115,10 +107,7 @@ export const DynamicPage: React.FC = () => {
         console.error("Failed to parse sections", e);
     }
 
-    // Find IntroCard explicitly to render it within Hero if needed
     const introCard = sections.find((s: any) => s.type === 'intro-card');
-
-    // Filter out IntroCard from main sections if we render it in Hero
     const mainSections = sections.filter((s: any) => s.type !== 'intro-card');
 
     return (
@@ -172,8 +161,8 @@ export const DynamicPage: React.FC = () => {
         .animation-delay-600 { animation-delay: 0.6s; opacity: 0; }
       `}</style>
 
-            {/* Hero Section */}
-            <section className="relative min-h-[60vh] flex items-center overflow-hidden"
+            {/* Default Hero Section */}
+            <section className="relative min-h-[60vh] h-[100vh] flex items-center overflow-hidden"
                 style={{
                     backgroundImage: heroImage ? `url('${API_BASE}${heroImage}')` : 'none',
                     backgroundSize: 'cover',
@@ -185,9 +174,8 @@ export const DynamicPage: React.FC = () => {
                 <div className="absolute bottom-20 left-10 w-[600px] h-[600px] bg-slate-300 rounded-full opacity-30 blur-3xl animate-float-reverse"></div>
                 <div className="absolute top-40 right-32 w-32 h-32 bg-red-600 rounded-full opacity-20 blur-2xl animate-pulse-slow"></div>
 
-                <div className="container mx-auto px-8 py-20 relative z-10">
+                <div className="container px-8 py-20 relative z-10">
                     <div className="grid lg:grid-cols-2 gap-16 items-center">
-                        {/* Left Content */}
                         <div className="space-y-8">
                             <div className="w-16 h-1 bg-red-600 mb-4 animate-fade-in"></div>
 
@@ -217,12 +205,10 @@ export const DynamicPage: React.FC = () => {
                             )}
                         </div>
 
-                        {/* Right side - where intro card will be positioned absolutely */}
                         <div className="hidden lg:block"></div>
                     </div>
                 </div>
 
-                {/* IntroCard positioned absolutely in bottom-right */}
                 {introCard && <IntroCard {...introCard} />}
             </section>
 
